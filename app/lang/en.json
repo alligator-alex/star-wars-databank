@@ -1,0 +1,12 @@
+{
+    "Media": "Media",
+
+    "length": "Length",
+    "width": "Width",
+    "height": "Height",
+    "maxSpeed": "Maximum speed",
+    "maxAcceleration": "Maximum acceleration",
+    "diameter": "Diameter",
+    "mglt": "Megalight per hour (MGLT)",
+    "hyperdriveRating": "Hyperdrive rating"
+}

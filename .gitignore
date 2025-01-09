@@ -1,0 +1,7 @@
+/.idea
+/.env
+/docker-compose.override.yml
+/*.sql
+/.database*
+/.imgproxy*
+/.rabbitmq*

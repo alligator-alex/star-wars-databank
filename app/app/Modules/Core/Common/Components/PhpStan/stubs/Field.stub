@@ -1,0 +1,11 @@
+<?php
+
+namespace Orchid\Screen;
+
+/**
+ * @method static title(string $value)
+ * @method static hidden()
+ */
+class Field
+{
+}

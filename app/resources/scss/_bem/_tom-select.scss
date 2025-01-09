@@ -1,0 +1,267 @@
+.ts-wrapper {
+    font-size: 1rem;
+    position: relative;
+
+    .ts-control {
+        align-items: center;
+        background-color: #c5c5c5;
+        border: 2px solid $black-90pct-transparent;
+        border-radius: 5px;
+        cursor: pointer;
+        display: flex;
+        justify-content: start;
+        outline: 4px solid transparent;
+        overflow: hidden;
+        position: relative;
+        transition-duration: 0.2s;
+        transition-property: background-color, border-color, outline-color;
+        transition-timing-function: ease-in-out;
+    }
+
+    &:hover {
+        .ts-control {
+            background-color: $dark-grey;
+        }
+
+        .clear-button {
+            color: $light-grey;
+        }
+
+        input {
+            &::placeholder {
+                color: $light-grey;
+            }
+        }
+    }
+
+    &.focus {
+        .ts-control {
+            border-color: transparent;
+            outline-color: $yellow;
+
+            input {
+                cursor: initial;
+            }
+        }
+    }
+
+    .clear-button {
+        align-items: center;
+        border-radius: 5px;
+        cursor: pointer;
+        display: none;
+        height: 2rem;
+        justify-content: center;
+        margin: 0;
+        position: absolute;
+        right: 0;
+        text-align: center;
+        top: 50%;
+        transform: translateY(-50%);
+        transition: 0.2s ease-in-out;
+        transition-property: background-color, color;
+        width: 2rem;
+
+        &:hover {
+            background-color: $yellow;
+            color: $black;
+        }
+    }
+
+    input {
+        background: none;
+        border: 0;
+        color: $white;
+        cursor: pointer;
+        flex: 1 0 30%;
+        font-size: 1rem;
+        line-height: 1;
+        min-width: auto;
+        padding: 0.4em 0.8em;
+        position: relative;
+        text-overflow: ellipsis;
+        z-index: 1;
+
+        &::placeholder {
+            color: $dark-grey;
+            transition: color 0.2s ease-in-out;
+        }
+
+        &[type=checkbox] {
+            display: none;
+        }
+    }
+
+    &.has-items {
+        .ts-control {
+            padding: 0.4em 0 0;
+        }
+
+        input {
+            margin: 0 0 0.3em 0.4em;
+            padding: 0;
+        }
+
+        .clear-button {
+            display: flex;
+        }
+    }
+
+    &.plugin-clear_button {
+        .ts-control {
+            padding-right: 2em;
+        }
+    }
+
+    .item {
+        align-items: center;
+        background-color: $yellow;
+        border-radius: 5px;
+        color: $black;
+        font-weight: 500;
+        margin: 0 0 0.3em 0.4em;
+        overflow: hidden;
+        padding: 0 1.5em 0 0.4em;
+        position: relative;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        &--dummy {
+            flex-shrink: 0;
+            padding-right: 0.4em;
+        }
+
+        &:first-child {
+            margin-left: 0;
+        }
+
+        .remove {
+            height: 100%;
+            margin-left: 0.2em;
+            padding: 0 0.4em;
+            position: absolute;
+            right: 0;
+            text-decoration: none;
+            top: 0;
+            transition: 0.2s ease-in-out;
+            transition-property: background-color, color;
+
+            &:hover {
+                background-color: $black;
+                color: $yellow;
+            }
+        }
+    }
+
+    .ts-dropdown {
+        background-color: #cecece;
+        border: 2px solid rgba(0 0 0 / 5%);
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
+        border-top: 0;
+        box-shadow: 0 2px 4px 2px $black-90pct-transparent;
+        line-height: 1.2;
+        overflow: hidden;
+        position: absolute;
+        top: 100%;
+        transform: translateY(4px);
+        width: 100%;
+        z-index: 1000;
+
+        .ts-dropdown-content {
+            max-height: 13rem;
+            overflow: hidden auto;
+            scroll-behavior: smooth;
+        }
+
+        .optgroup {
+            border-bottom: 1px solid $black-50pct-transparent;
+            margin-bottom: 1em;
+
+            &:last-child {
+                border-bottom: 0;
+                margin-bottom: 0;
+            }
+
+            .option {
+                &:last-child {
+                    margin-bottom: 0;
+                }
+            }
+        }
+
+        .optgroup-header {
+            color: $dark-grey;
+            font-weight: 500;
+            padding: 0.4em 0.8em;
+            text-transform: uppercase;
+        }
+
+        .option {
+            cursor: pointer;
+            padding: 0.4em 0.8em 0.4em 2em;
+            position: relative;
+            transition: 0.2s ease-in-out;
+            transition-property: background-color, color;
+
+            &:nth-child(even) {
+                background-color: #c5c5c5;
+            }
+
+            &:hover {
+                background-color: $yellow;
+                color: $black;
+
+                &::after {
+                    background-color: $dark-grey;
+                }
+            }
+
+            &::before,
+            &::after {
+                content: '';
+                display: block;
+                position: absolute;
+            }
+
+            &::before {
+                border: 2px solid $black-90pct-transparent;
+                border-radius: 0.2rem;
+                height: 1em;
+                left: 0.4em;
+                top: 0.5em;
+                width: 1em;
+            }
+
+            &::after {
+                background-color: $blue;
+                border-radius: 0.1rem;
+                display: none;
+                height: 0.6em;
+                left: 0.6em;
+                top: 0.7em;
+                transition: background-color 0.2s ease-in-out;
+                width: 0.6em;
+            }
+
+            &.selected {
+                &::after {
+                    display: block;
+                }
+            }
+        }
+
+        .no-results {
+            padding: 0.2em 0.5em;
+        }
+    }
+}
+
+.ts-hidden-accessible {
+    border: 0;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+    width: 0;
+}

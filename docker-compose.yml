@@ -1,0 +1,99 @@
+services:
+  app:
+    image: ${COMPOSE_PROJECT_NAME}-app
+    build:
+      context: ./build/app
+      args:
+        - USER_ID=${USER_ID:?error}
+        - GROUP_ID=${GROUP_ID:?error}
+    container_name: ${COMPOSE_PROJECT_NAME}-app
+    environment:
+      PHP_IDE_CONFIG: "serverName=Docker"
+      XDEBUG_CONFIG: "client_host=${XDEBUG_CLIENT_HOST}"
+      XDEBUG_MODE: coverage # or debug
+    working_dir: /var/www/app
+    volumes:
+      - ./app:/var/www/app
+    depends_on:
+      - database
+      - rabbitmq
+    restart: unless-stopped
+
+  nginx:
+    image: ${COMPOSE_PROJECT_NAME}-nginx
+    build:
+      context: ./build/nginx
+    container_name: ${COMPOSE_PROJECT_NAME}-nginx
+    volumes:
+      - ./app/public:/var/www/app/public
+      - ./build/nginx/configs/conf.d:/etc/nginx/conf.d
+      - ./.imgproxy-cache:/var/cache/nginx/imgproxy:delegated
+    ports:
+      - ${NGINX_PORT:-800}:80
+    depends_on:
+      - app
+      - imgproxy
+    restart: unless-stopped
+
+  database:
+    image: postgres:17-alpine
+    container_name: ${COMPOSE_PROJECT_NAME}-database
+    environment:
+      - POSTGRES_DB=${POSTGRES_DATABASE:?error}
+      - POSTGRES_USER=${POSTGRES_USERNAME:?error}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?error}
+    volumes:
+      - ./.database:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  imgproxy:
+    image: darthsim/imgproxy:latest
+    container_name: ${COMPOSE_PROJECT_NAME}-imgproxy
+    depends_on:
+      - app
+    volumes:
+      - ./app/storage/app/public:/var/www/imgproxy/public:cached
+      - ./app/public/images/static.gif:/var/www/imgproxy/images/static.gif
+    expose:
+      - 8080
+    healthcheck:
+      test: [ "CMD", "imgproxy", "health" ]
+    restart: unless-stopped
+    environment:
+      ## See: https://docs.imgproxy.net/configuration
+      IMGPROXY_LOG_LEVEL: "warn"
+      IMGPROXY_DEVELOPMENT_ERRORS_MODE: "false"
+      IMGPROXY_REPORT_DOWNLOADING_ERRORS: "false"
+      IMGPROXY_FALLBACK_IMAGE_PATH: /var/www/imgproxy/images/static.gif
+      IMGPROXY_FALLBACK_IMAGE_HTTP_CODE: 404
+
+      ### timeouts
+      IMGPROXY_READ_REQUEST_TIMEOUT: 10
+      IMGPROXY_TIMEOUT: 10
+      IMGPROXY_DOWNLOAD_TIMEOUT: 10
+      IMGPROXY_KEEP_ALIVE_TIMEOUT: 300
+      IMGPROXY_MAX_SRC_FILE_SIZE: 20971520 # 20MB
+
+      ### image source
+      IMGPROXY_TTL: 2592000 # client-side cache time is 30 days
+      IMGPROXY_USE_ETAG: "false"
+      IMGPROXY_SO_REUSEPORT: "true"
+      IMGPROXY_IGNORE_SSL_VERIFICATION: "true"
+      IMGPROXY_LOCAL_FILESYSTEM_ROOT: /var/www/imgproxy/public
+      IMGPROXY_SKIP_PROCESSING_FORMATS: "svg"
+
+      ## presets defaults
+      IMGPROXY_AUTO_ROTATE: "true"
+      IMGPROXY_PRESETS: "default=resizing_type:fit/gravity:sm"
+
+      ## compression
+      IMGPROXY_STRIP_METADATA: "true"
+      IMGPROXY_STRIP_COLOR_PROFILE: "true"
+      IMGPROXY_FORMAT_QUALITY: "jpeg=80,webp=70,avif=50"
+      IMGPROXY_JPEG_PROGRESSIVE: "false"
+      IMGPROXY_PNG_INTERLACED: "false"
+      IMGPROXY_PNG_QUANTIZATION_COLORS: 128
+      IMGPROXY_PNG_QUANTIZE: "false"
+      IMGPROXY_MAX_ANIMATION_FRAMES: 64
+      IMGPROXY_GZIP_COMPRESSION: 0
+      IMGPROXY_AVIF_SPEED: 8

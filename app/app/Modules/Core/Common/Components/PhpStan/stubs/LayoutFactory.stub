@@ -1,0 +1,27 @@
+<?php
+
+namespace Orchid\Screen;
+
+use Orchid\Screen\Layouts\Modal;
+
+
+
+/**
+ * Class LayoutFactory.
+ */
+class LayoutFactory
+{
+    /**
+     * @param string $key
+     * @param mixed $layouts
+     *
+     * @return Modal
+     */
+    public static function modal(string $key, $layouts): Modal
+    {
+        $layouts = Arr::wrap($layouts);
+
+        return new class($key, $layouts) extends Modal {
+        };
+    }
+}

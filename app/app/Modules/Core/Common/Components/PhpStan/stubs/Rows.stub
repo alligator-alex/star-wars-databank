@@ -1,0 +1,11 @@
+<?php
+
+namespace Orchid\Screen\Layouts;
+
+class Rows
+{
+    /**
+     * @return array<mixed, mixed>
+     */
+    abstract protected function fields(): array;
+}

@@ -1,0 +1,57 @@
+.page-wrapper {
+    &--error {
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        align-items: center;
+        display: flex;
+        justify-content: center;
+
+        .container {
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .page-wrapper__bg-container {
+            display: none;
+        }
+
+        .container {
+            color: #fff;
+        }
+
+        .page-title .aurebesh {
+            color: #e2e2e2;
+        }
+    }
+
+    &--error-404 {
+        background-image: url('../images/404.jpg');
+    }
+
+    &--error-500 {
+        background-image: url('../images/500.jpg');
+    }
+}
+
+.error-code {
+    color: #ffc50b;
+    font-size: 10rem;
+    line-height: 1;
+    margin: 0;
+}
+
+.error-message {
+    font-weight: 500;
+}
+
+.error-quote {
+    color: #ffc50b;
+    font-size: 1.25rem;
+    font-style: italic;
+    font-weight: bold;
+    margin: 2em 0;
+}

@@ -1,0 +1,18 @@
+<?php
+
+namespace Orchid\Screen;
+
+/**
+ * @method static sort(bool $sort = true)
+ * @method static defaultHidden(bool $sort = true)
+ */
+class Cell
+{
+    /**
+     * @param bool $sort
+     *
+     * @return $this
+     */
+    public function sort(bool $sort = true)
+    {}
+}

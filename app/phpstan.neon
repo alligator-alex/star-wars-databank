@@ -1,0 +1,26 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app
+
+    stubFiles:
+        - app/Modules/Core/Common/Components/PhpStan/stubs/Field.stub
+        - app/Modules/Core/Common/Components/PhpStan/stubs/Screen.stub
+        - app/Modules/Core/Common/Components/PhpStan/stubs/Cell.stub
+        - app/Modules/Core/Common/Components/PhpStan/stubs/Link.stub
+        - app/Modules/Core/Common/Components/PhpStan/stubs/LayoutFactory.stub
+        - app/Modules/Core/Common/Components/PhpStan/stubs/Modal.stub
+        - app/Modules/Core/Common/Components/PhpStan/stubs/Rows.stub
+        - app/Modules/Core/Common/Components/PhpStan/stubs/Textarea.stub
+
+    level: 6
+
+    ignoreErrors:
+        - '#Unsafe usage of new static#'
+        - identifier: missingType.generics
+        - identifier: missingType.iterableValue
+        - identifier: varTag.nativeType
+
+    reportUnmatchedIgnoredErrors: false

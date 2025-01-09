@@ -1,0 +1,65 @@
+/** Paths must be relative to app.scss! **/
+@font-face {
+    font-family: 'FT Aurebesh';
+    src: url('../fonts/FTAurebesh-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FT Aurebesh';
+    src: url('../fonts/FTAurebesh-Bold.woff2') format('woff2');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'RogueAF';
+    src: url('../fonts/RogueAF.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src: url('../fonts/Montserrat-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src: url('../fonts/Montserrat-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src: url('../fonts/Montserrat-Bold.woff2') format('woff2');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Gabarito';
+    src: url('../fonts/Gabarito-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+$font-family-common: 'Montserrat', sans-serif !default;
+$font-family-title: 'Gabarito', sans-serif !default;
+$font-family-aurebesh: 'FT Aurebesh', sans-serif !default;
+$font-family-icons: 'RogueAF', monospace !default;
+
+$font-size-mobile: 16px !default;
+$font-size-desktop: 20px;
+$line-height-common: 1.333 !default;

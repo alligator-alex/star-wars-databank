@@ -1,0 +1,151 @@
+.vehicle-list {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -0.5rem;
+
+    &__item-wrapper {
+        padding: 0.5rem;
+        width: 100%;
+
+        @media(min-width: $desktop-min) {
+            width: 33.333%;
+        }
+    }
+
+    &__item {
+        border-radius: 5px;
+        box-shadow: 0 2px 4px 2px $black-90pct-transparent;
+        display: flex;
+        flex-direction: column;
+        height: 340px;
+        outline: 4px solid transparent;
+        overflow: hidden;
+        position: relative;
+        text-decoration: none;
+        transition: outline-color 0.2s ease-in-out;
+
+        &--large {
+            height: 700px;
+        }
+
+        .rogue-links {
+            color: $dark-grey;
+            font-size: 0.7rem;
+            line-height: 1;
+            margin-top: 1em;
+            transition: color 0.2s ease-in-out;
+
+            &__value {
+                color: $black;
+                transition: color 0.2s ease-in-out;
+            }
+        }
+
+        &:hover,
+        &[data-preview-target] {
+            outline-color: $yellow;
+
+            .vehicle-list__info {
+                background-color: $dark-grey;
+
+                .vehicle-list__faction-emblem {
+                    color: $yellow;
+                }
+            }
+
+            .vehicle-list__name {
+                color: $yellow;
+            }
+
+            .rogue-links {
+                color: $light-grey;
+
+                &__value {
+                    color: $yellow;
+                }
+            }
+
+            .vehicle-list__factions,
+            .vehicle-list__image img {
+                filter: none;
+            }
+
+            .vehicle-list__image img {
+                transform: translate(-50%, -50%) scale(1.05);
+            }
+        }
+    }
+
+    &__factions {
+        display: flex;
+        filter: grayscale(0.5);
+        gap: 0.25rem;
+        left: 1rem;
+        position: absolute;
+        top: 0.75rem;
+        transition: filter 0.2s ease-in-out;
+        z-index: 2;
+    }
+
+    &__faction-emblem {
+        height: 1.5rem;
+        width: 1.5rem;
+    }
+
+    &__info {
+        background-color: $light-grey;
+        padding: 0.75rem 1rem;
+        transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+        width: 100%;
+        z-index: 2;
+    }
+
+    &__name {
+        color: $black;
+        font-family: $font-family-title;
+        font-size: 1.25rem;
+        line-height: 1.2;
+        margin: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-transform: uppercase;
+        transition: color 0.2s ease-in-out;
+        white-space: nowrap;
+
+        &-last-word {
+            white-space: nowrap;
+        }
+    }
+
+    &__image {
+        background: linear-gradient(45deg, #bdbdbd, #e6e6e6 50%, #bdbdbd);
+        height: 100%;
+        position: relative;
+        width: 100%;
+
+        img {
+            filter: brightness(0.8) grayscale(0.2);
+            height: 100%;
+            left: 50%;
+            max-width: initial;
+            object-fit: contain;
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            transition-duration: 0.2s;
+            transition-property: filter, transform;
+            transition-timing-function: ease-in-out;
+            width: 100%;
+
+            &.is-dummy {
+                object-fit: cover;
+            }
+        }
+
+        &--covered {
+            img {
+                object-fit: cover;
+            }
+        }
+    }
+}

@@ -1,0 +1,32 @@
+<?php
+
+namespace Orchid\Screen\Actions;
+
+/**
+ * Class Link.
+
+ * @method Link name(string $name = null)
+ * @method Link icon(string $icon = null)
+ * @method Link class(string $classes = null)
+ * @method Link parameters(array<mixed>|object $name)
+ * @method Link target(string $target = null)
+ * @method Link title(string $title = null)
+ * @method Link download($download = true)
+ * @method Link style(string $value)
+ */
+class Link
+{
+    /**
+     * @param string $name
+     * @param mixed  $parameters
+     * @param bool   $absolute
+     *
+     * @return $this
+     */
+    public function route(string $name, $parameters = [], $absolute = true): self
+    {
+        $route = route($name, $parameters, $absolute);
+
+        return $this->href($route);
+    }
+}

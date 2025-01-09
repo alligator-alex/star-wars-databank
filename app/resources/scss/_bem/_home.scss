@@ -1,0 +1,203 @@
+.page-wrapper--home-page {
+    .intro {
+        align-items: center;
+        animation-delay: 5s;
+        animation-duration: 1s;
+        animation-fill-mode: forwards;
+        animation-name: a-long-time-ago-bg;
+        animation-timing-function: ease-in-out;
+        background-color: #070707;
+        display: flex;
+        height: 100vh;
+        justify-content: center;
+        left: 0;
+        padding: 1rem;
+        position: fixed;
+        top: 0;
+        user-select: none;
+        width: 100%;
+        z-index: 2;
+
+        &__title {
+            animation-duration: 6s;
+            animation-fill-mode: forwards;
+            animation-name: a-long-time-ago;
+            animation-timing-function: ease-in-out;
+            color: #06e2ff;
+            font-family: $font-family-common;
+            font-size: 2.25rem;
+            font-weight: normal;
+            margin: 0;
+            text-align: left;
+            text-transform: none;
+        }
+
+        &__skip-button {
+            bottom: 1rem;
+            color: $light-grey;
+            cursor: pointer;
+            font-weight: bold;
+            position: absolute;
+            right: 2rem;
+            text-transform: uppercase;
+            transition: color 0.2s ease-in-out;
+
+            &:hover {
+                color: $yellow;
+            }
+        }
+    }
+
+    @keyframes a-long-time-ago-bg {
+        0% {
+            clip-path: circle(100% at 50% 50%);
+        }
+
+        100% {
+            clip-path: circle(0% at 50% 50%);
+            display: none;
+        }
+    }
+
+    @keyframes a-long-time-ago {
+        0% {
+            opacity: 0;
+        }
+
+        30% {
+            opacity: 1;
+        }
+
+        70% {
+            opacity: 1;
+        }
+
+        100% {
+            opacity: 0;
+        }
+    }
+
+    .page-title {
+        text-align: center;
+    }
+
+    .explorer {
+        text-align: center;
+
+        .pagination__button {
+            transition-property: background-color, color, transform;
+        }
+    }
+
+    hr {
+        background-color: $black-80pct-transparent;
+        border: 0;
+        height: 2px;
+        margin: 2.5rem 0;
+    }
+
+    h2 {
+        margin-bottom: 1.75rem;
+        text-align: center;
+
+        &:last-child {
+            margin: 0;
+        }
+
+        .rogue-icon {
+            margin-right: -0.25rem;
+        }
+    }
+
+    .factions-selector {
+        align-items: start;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin: 0 -0.5rem 3rem;
+        text-align: center;
+
+        &__item {
+            align-items: center;
+            color: $black;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin: 0 0 1rem;
+            padding: 0 0.5rem;
+            position: relative;
+            text-decoration: none;
+            transition: none;
+            width: 50%;
+
+            @media(min-width: $desktop-min) {
+                margin: 0;
+                width: 11.1111%;
+
+                &:hover {
+                    .factions-selector__emblem {
+                        transform: scale(1.1);
+                    }
+                }
+            }
+
+            &:hover {
+                color: $blue;
+
+                .factions-selector__emblem {
+                    filter: none;
+                }
+            }
+        }
+
+        &__emblem {
+            filter: grayscale(0.5);
+            flex-shrink: 0;
+            height: 7rem;
+            margin-bottom: 1rem;
+            transition-duration: 0.2s;
+            transition-property: filter, transform;
+            transition-timing-function: ease-in-out;
+            width: 100%;
+        }
+
+        &__name {
+            font-weight: 500;
+            text-transform: uppercase;
+            transition: color 0.2s ease-in-out;
+        }
+    }
+
+    .appearances {
+        &__title {
+            color: $dark-grey;
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        &__group {
+            margin-bottom: 1rem;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+        &__wrapper {
+            margin-bottom: 2rem;
+            width: 50%;
+
+            @media(min-width: $desktop-min) {
+                width: 12.5%;
+            }
+        }
+
+        &__item {
+            width: 100%;
+
+            &:hover {
+                color: $blue;
+            }
+        }
+    }
+}

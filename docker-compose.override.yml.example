@@ -1,0 +1,30 @@
+services:
+  database:
+    ports:
+      - ${POSTGRES_PORT_EXPOSED:-15432}:${POSTGRES_PORT:-5432}
+
+  database-test:
+    image: postgres:17-alpine
+    container_name: ${COMPOSE_PROJECT_NAME}-database-test
+    environment:
+      - POSTGRES_DB=${POSTGRES_DATABASE_TEST:?error}
+      - POSTGRES_USER=${POSTGRES_USERNAME:?error}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?error}
+    volumes:
+      - ./.database-test:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: ${COMPOSE_PROJECT_NAME}-rabbitmq
+    hostname: sw-vehicles
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_ADMIN_USERNAME:?error}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_ADMIN_PASSWORD:?error}
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit log_levels [{connection,error},{default,error}] disk_free_limit ${RABBITMQ_DISK_FREE_LIMIT:-2147483648}
+    volumes:
+      - ./.rabbitmq/:/var/lib/rabbitmq/mnesia
+    ports:
+      - ${RABBITMQ_MANAGER_PORT_EXPOSED:-15672}:15672
+      - 5672:5672
+    restart: unless-stopped

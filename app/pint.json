@@ -1,0 +1,8 @@
+{
+    "preset": "psr12",
+    "exclude": [
+        "database",
+        "resources",
+        "storage"
+    ]
+}

@@ -1,0 +1,68 @@
+/** Full-width images **/
+.cropper-preview,
+.picture-preview {
+    max-width: unset;
+    -o-object-fit: contain;
+    object-fit: contain;
+}
+
+.list-image-preview {
+    width: 100px;
+    display: block;
+    text-align: center;
+}
+
+.list-image-preview img {
+    max-height: 100px;
+    max-width: 100%;
+}
+
+.form-control.full-width {
+    max-width: none;
+}
+
+/**
+ * Temporary for missing select arrows
+ * @see https://github.com/orchidsoftware/platform/issues/2865
+ * @see https://tom-select.js.org/examples/
+ */
+.ts-wrapper.form-control:not(.disabled).single .ts-control,
+.ts-wrapper.form-control:not(.disabled).single.input-active .ts-control,
+.ts-wrapper.form-select:not(.disabled).single .ts-control,
+.ts-wrapper.form-select:not(.disabled).single.input-active .ts-control {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.75rem center !important;
+    background-size: 16px 12px !important;
+}
+
+/** Highlight active select items **/
+.ts-dropdown .active {
+    background-color: var(--bs-gray-400);
+}
+
+.ts-dropdown .selected {
+    background-color: var(--bs-secondary);
+    color: var(--bs-white);
+}
+
+.ts-dropdown .selected.active {
+    background-color: var(--bs-primary);
+}
+
+tbody tr:nth-child(odd) td {
+    background-color: #f5f5f5;
+}
+
+/** Quill WYSIWYG editor **/
+.ql-editor p {
+    margin: 1em 0;
+}
+
+.ql-editor p:first-child {
+    margin-top: 0;
+}
+
+.ql-editor p:last-child {
+    margin-top: 0;
+}

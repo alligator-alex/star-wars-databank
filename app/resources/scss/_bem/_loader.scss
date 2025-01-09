@@ -1,0 +1,78 @@
+.loader-wrapper {
+    position: relative;
+}
+
+.loader {
+    height: 100%;
+    left: 0;
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    user-select: none;
+    visibility: hidden;
+    width: 100%;
+    z-index: 500;
+
+    &.is-loading {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    &__spinner {
+        animation: rotation 1s linear infinite;
+        cursor: progress;
+        height: 50px;
+        left: 50%;
+        position: fixed;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 50px;
+        z-index: 2;
+
+        &::after,
+        &::before {
+            border-radius: 50%;
+            content: '';
+            position: absolute;
+        }
+
+        /** Tatooine binary star **/
+        &::before {
+            background-color: #faec3d;
+            bottom: 0;
+            box-shadow: 0 0 5px #faec3d;
+            height: 20px;
+            right: 0;
+            width: 20px;
+        }
+
+        &::after {
+            background-color: #fbfdd8;
+            box-shadow: 0 0 15px 5px #f9f59e;
+            height: 15px;
+            left: 0;
+            top: 0;
+            width: 15px;
+        }
+    }
+
+    &__overlay {
+        backdrop-filter: blur(5px) grayscale(0.5);
+        bottom: -10px;
+        cursor: progress;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: -10px;
+    }
+}
+
+@keyframes rotation {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+
+    100% {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
