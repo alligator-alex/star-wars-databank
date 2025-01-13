@@ -57,6 +57,7 @@ class VehicleService
             $this->applyFilters($query, $filter);
         }
 
+        $query->orderBy('name');
         $query->orderBy('sort');
         $query->orderByDesc('id');
 

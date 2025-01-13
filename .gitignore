@@ -5,3 +5,4 @@
 /.database*
 /.imgproxy*
 /.rabbitmq*
+/app/resources/views/public/layouts/partials/counters.blade.php

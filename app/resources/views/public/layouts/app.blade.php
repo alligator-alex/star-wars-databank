@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\Route;
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset("/images/favicons/favicon-16x16.png") }}">
     <link rel="manifest" href="{{ asset('/images/favicons/site.webmanifest') }}">
     <meta name="theme-color" content="e5e5e5">
+
+    @includeIf('public.layouts.partials.counters')
 </head>
 <body>
 <div style="display:none;">
