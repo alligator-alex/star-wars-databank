@@ -49,10 +49,17 @@ $i = 0;
                 class="vehicle-list__image @if ($listPageSettings->isImageCovered()) vehicle-list__image--covered @endif">
                 @if ($vehicle->factions->isNotEmpty())
                     <div class="vehicle-list__factions">
-                        @foreach ($vehicle->factions->sortByDesc('main', SORT_NATURAL) as $faction)
-                            <div
-                                class="vehicle-list__faction-emblem faction-emblem faction-emblem--{{ $faction->slug }}"
-                                title="{{ __('Used by the') }} {{ $faction->name }}">
+                        @if ($vehicle->mainFaction)
+                            <div class="vehicle-list__faction-emblem vehicle-list__faction-emblem--main faction-emblem faction-emblem--{{ $vehicle->mainFaction->slug }}"
+                                 title="{{ __('Mainly used by the') }} {{ $vehicle->mainFaction->name }}">
+                                <svg>
+                                    <use xlink:href="#emblem-{{ $vehicle->mainFaction->slug }}"></use>
+                                </svg>
+                            </div>
+                        @endif
+                        @foreach ($vehicle->otherFactions as $faction)
+                            <div class="vehicle-list__faction-emblem faction-emblem faction-emblem--{{ $faction->slug }}"
+                                 title="{{ $vehicle->mainFaction ? __('Also used by the') :  __('Used by the') }} {{ $faction->name }}">
                                 <svg>
                                     <use xlink:href="#emblem-{{ $faction->slug }}"></use>
                                 </svg>

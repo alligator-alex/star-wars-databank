@@ -50,6 +50,7 @@ class VehicleService
         $query->with([
             'image',
             'mainFaction',
+            'otherFactions',
         ]);
 
         if ($filter) {

@@ -17,15 +17,19 @@
         box-shadow: 0 2px 4px 2px $black-90pct-transparent;
         display: flex;
         flex-direction: column;
-        height: 340px;
+        height: 300px;
         outline: 4px solid transparent;
         overflow: hidden;
         position: relative;
         text-decoration: none;
         transition: outline-color 0.2s ease-in-out;
 
-        &--large {
-            height: 700px;
+        @media(min-width: $desktop-min) {
+            height: 340px;
+
+            &--large {
+                height: 700px;
+            }
         }
 
         .rogue-links {
@@ -88,8 +92,13 @@
     }
 
     &__faction-emblem {
-        height: 1.5rem;
-        width: 1.5rem;
+        height: 1.25rem;
+        width: 1.25rem;
+
+        &--main {
+            height: 2rem;
+            width: 2rem;
+        }
     }
 
     &__info {
