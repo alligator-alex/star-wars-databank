@@ -30,7 +30,7 @@ export default class VehicleListPage {
         }
 
         this.filter = document.querySelector(".js-vehicle-filter");
-        this.filterToggle = this.filter.querySelector(".js-filter-toggle");
+        this.filterToggle = document.querySelector(".js-filter-toggle");
         this.pagination = document.querySelector(".js-pagination-content");
 
         if (window.screen.width > 1024) {
@@ -54,6 +54,13 @@ export default class VehicleListPage {
         if (this.filter === null) {
             return;
         }
+
+        this.filterToggle.addEventListener("click", (event: Event) => {
+            event.preventDefault();
+
+            this.filterToggle.classList.toggle("is-active");
+            this.filter.classList.toggle("is-active");
+        });
 
         const selectSettings = {
             allowEmptyOption: true,
@@ -98,6 +105,7 @@ export default class VehicleListPage {
 
         select.wrapper.querySelectorAll('[data-ts-item]').forEach((element: HTMLElement, key: number): void => {
             if (key === 0) {
+                element.style.display = "";
                 return;
             }
 
@@ -112,9 +120,7 @@ export default class VehicleListPage {
         dummyItem = document.createElement("div");
 
         dummyItem.classList.add("item", "item--dummy")
-
         dummyItem.dataset.tsItemDummy = "1";
-
         dummyItem.textContent = (select.items.length - 1) + "+";
 
         select.control.insertBefore(dummyItem, select.control_input);
@@ -152,53 +158,65 @@ export default class VehicleListPage {
 
         const form: HTMLFormElement = this.filter as HTMLFormElement;
 
-        let url: string = form.getAttribute("action");
-        let displayUrl: string = url;
+        const url = new URL(form.getAttribute("action"), window.location.origin);
 
-        let filterParams: string = new URLSearchParams(new FormData(form) as unknown as Record<string, string>).toString();
+        const filterParams: URLSearchParams = new URLSearchParams(
+            new FormData(form) as unknown as Record<string, string>
+        );
 
-        if (filterParams !== "") {
-            url += "?" + filterParams;
-            displayUrl = url;
-
-            this.filterToggle.dataset.appliedFiltersCount = filterParams.split('&').length.toString();
-        } else {
-            this.filterToggle.dataset.appliedFiltersCount = '0';
+        if (filterParams.size > 0) {
+            filterParams.forEach((value: string, key: string) => {
+                url.searchParams.append(key, value);
+            });
         }
 
-        if (page > 1) {
-            if (filterParams !== "") {
-                url += "&";
-            } else {
-                url += "?";
+        let uniqueFilters: Array<string> = [];
+        for (const key of url.searchParams.keys()) {
+            if (uniqueFilters.includes(key)) {
+                continue;
             }
 
-            url += "page=" + page;
+            uniqueFilters.push(key);
         }
 
-        window.axios.get(url).then(response => {
-            this.detachPaginationEvents();
+        this.filterToggle.querySelector(".js-filter-toggle-label").dataset.appliedFiltersCount = uniqueFilters.length;
 
-            response.data = response.data as VehicleListResponse;
+        if (page) {
+            url.searchParams.append("page", page.toString());
+        }
 
-            if (reload) {
-                this.list.innerHTML = response.data.html.list;
-            } else {
-                this.list.insertAdjacentHTML("beforeend", response.data.html.list);
-            }
+        try {
+            fetch(url, {
+                method: "GET",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            }).then((response): Promise<any> => {
+                return response.json();
+            }).then((jsonResponse): void => {
+                this.detachPaginationEvents();
 
-            this.pagination.innerHTML = response.data.html.pagination;
+                jsonResponse = jsonResponse as VehicleListResponse;
 
-            //this.listMasonry = new Masonry(this.list);
-            document.dispatchEvent(new Event("masonry.reload"));
+                if (reload) {
+                    this.list.innerHTML = jsonResponse.html.list;
+                } else {
+                    this.list.insertAdjacentHTML("beforeend", jsonResponse.html.list);
+                }
 
-            this.attachPaginationEvents();
+                this.pagination.innerHTML = jsonResponse.html.pagination;
 
-            history.pushState({}, "", displayUrl);
-        }).catch(e => {
-            console.error(e);
-        }).then((): void => {
-            loader.classList.remove("is-loading");
-        });
+                document.dispatchEvent(new Event("masonry.reload"));
+
+                this.attachPaginationEvents();
+
+                url.searchParams.delete("page");
+                history.pushState({}, "", url);
+            }).then((): void => {
+                loader.classList.remove("is-loading");
+            });
+        } catch (error) {
+            console.error(error.message);
+        }
     }
 }

@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 
 /**
  * @var array<string, string[]> $appliedFilters
+ * @var int $appliedFiltersCount
  * @var Collection<Vehicle> $vehicles
  * @var array<int, string> $factions
  * @var array<int, string> $manufacturers
@@ -29,11 +30,30 @@ Breadcrumbs::add(__('Vehicles'), VehicleRouteName::LIST->value);
 
 @section('content')
     <section class="container">
-        <div class="page-title">
-            <h1 class="wow fadeInUp">Vehicles</h1>
-            <noindex>
-                <p class="aurebesh wow fadeInUp" data-wow-delay="100ms">Vehicles</p>
-            </noindex>
+        <div class="heading-wrapper heading-wrapper--main">
+            <div class="page-title">
+                <h1 class="wow fadeInUp">Vehicles</h1>
+                <noindex>
+                    <p class="aurebesh wow fadeInUp" data-wow-delay="100ms">Vehicles</p>
+                </noindex>
+            </div>
+
+            <div class="filter-toggle">
+                <div class="vehicle-filter__title">
+                    <button class="vehicle-filter__toggle wow fadeInUp js-filter-toggle @if ($appliedFiltersCount > 0) is-active @endif"
+                           data-wow-delay="150ms">
+                        <span class="burger-menu-icon">
+                            <span class="burger-menu-icon__item"></span>
+                            <span class="burger-menu-icon__item"></span>
+                            <span class="burger-menu-icon__item"></span>
+                        </span>
+                        <span class="vehicle-filter__toggle-label js-filter-toggle-label"
+                              data-show-label="{{ __('Show filters') }}"
+                              data-hide-label="{{ __('Hide filters') }}"
+                              data-applied-filters-count="{{ $appliedFiltersCount }}"></span>
+                    </button>
+                </div>
+            </div>
         </div>
     </section>
 

@@ -18,12 +18,27 @@
         width: 100%;
         z-index: 2;
 
+        &::after {
+            animation-duration: 5s;
+            animation-fill-mode: forwards;
+            animation-name: a-long-time-ago-progress;
+            animation-timing-function: linear;
+            background: $yellow;
+            bottom: 0;
+            content: '';
+            display: block;
+            height: 4px;
+            position: absolute;
+            right: 0;
+            width: 100%;
+        }
+
         &__title {
             animation-duration: 6s;
             animation-fill-mode: forwards;
             animation-name: a-long-time-ago;
             animation-timing-function: ease-in-out;
-            color: #06e2ff;
+            color: $intro-blue;
             font-family: $font-family-common;
             font-size: 2.25rem;
             font-weight: normal;
@@ -33,14 +48,16 @@
         }
 
         &__skip-button {
-            bottom: 1rem;
             color: $light-grey;
             cursor: pointer;
-            font-weight: bold;
+            font-size: 2rem;
+            line-height: 2rem;
             position: absolute;
             right: 2rem;
             text-transform: uppercase;
+            top: 2rem;
             transition: color 0.2s ease-in-out;
+            width: 2rem;
 
             &:hover {
                 color: $yellow;
@@ -56,6 +73,16 @@
         100% {
             clip-path: circle(0% at 50% 50%);
             display: none;
+        }
+    }
+
+    @keyframes a-long-time-ago-progress {
+        0% {
+            width: 100%;
+        }
+
+        100% {
+            width: 0;
         }
     }
 
@@ -77,29 +104,13 @@
         }
     }
 
-    .page-title {
-        text-align: center;
-    }
-
-    .explorer {
-        text-align: center;
-
+    .explore {
         .pagination__button {
             transition-property: background-color, color, transform;
         }
     }
 
-    hr {
-        background-color: $black-80pct-transparent;
-        border: 0;
-        height: 2px;
-        margin: 2.5rem 0;
-    }
-
     h2 {
-        margin-bottom: 1.75rem;
-        text-align: center;
-
         &:last-child {
             margin: 0;
         }
@@ -114,7 +125,7 @@
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
-        margin: 0 -0.5rem 3rem;
+        margin: 0 -0.5rem;
         text-align: center;
 
         &__item {
@@ -131,8 +142,12 @@
             width: 50%;
 
             @media(min-width: $desktop-min) {
-                margin: 0;
-                width: 11.1111%;
+                margin: 0 0 2.5rem;
+                width: 20%;
+            }
+
+            @media(min-width: $desktop-max) {
+                width: 11.1111111111%;
 
                 &:hover {
                     .factions-selector__emblem {
@@ -153,7 +168,7 @@
         &__emblem {
             filter: grayscale(0.5);
             flex-shrink: 0;
-            height: 7rem;
+            height: 5rem;
             margin-bottom: 1rem;
             transition-duration: 0.2s;
             transition-property: filter, transform;
@@ -163,7 +178,7 @@
 
         &__name {
             font-weight: 500;
-            text-transform: uppercase;
+            line-height: 1.15;
             transition: color 0.2s ease-in-out;
         }
     }
@@ -175,20 +190,16 @@
             text-align: left;
         }
 
-        &__group {
-            margin-bottom: 1rem;
-
-            &:last-child {
-                margin-bottom: 0;
-            }
-        }
-
         &__wrapper {
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
             width: 50%;
 
             @media(min-width: $desktop-min) {
-                width: 12.5%;
+                width: 25%;
+            }
+
+            @media(min-width: $desktop-max) {
+                width: 20%;
             }
         }
 

@@ -29,10 +29,6 @@ use Illuminate\Support\Facades\Route;
 </div>
 
 <div class="page-wrapper @yield('page-wrapper-class')">
-    <div class="page-wrapper__bg-container">
-        <div class="page-wrapper__bg"></div>
-    </div>
-
     <main class="page-content">
         @if (!isset($exception) && (Route::currentRouteName() !== 'home'))
             {!! Breadcrumbs::render() !!}

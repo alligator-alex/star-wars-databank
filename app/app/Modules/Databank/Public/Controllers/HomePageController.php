@@ -27,6 +27,7 @@ class HomePageController extends Controller
         return view('public.home', [
             'vehiclesCount' => $this->vehicleService->count(),
             'factions' => $this->factionService->findAll(),
+            'availableMediaTypes' => $this->mediaService->findAvailableTypes(),
             'media' => $this->mediaService->findAll(),
         ]);
     }

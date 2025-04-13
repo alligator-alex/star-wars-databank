@@ -15,7 +15,9 @@ RUN set -ex && \
         libxml2-dev \
         oniguruma-dev \
         libzip-dev \
-        bash
+        bash \
+        nodejs \
+        npm
 
 RUN docker-php-ext-install \
     opcache \

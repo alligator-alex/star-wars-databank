@@ -3,9 +3,9 @@
     color: $dark-grey;
     cursor: default;
     display: inline-flex;
-    font-size: 1rem;
-    margin-bottom: 1rem;
-    text-transform: uppercase;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
 
     &__divider {
         margin: 0 0.5rem;
@@ -22,6 +22,6 @@
     }
 
     &__text {
-        font-weight: 500;
+        font-weight: bold;
     }
 }

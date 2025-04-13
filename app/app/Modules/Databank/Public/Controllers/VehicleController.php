@@ -56,15 +56,18 @@ class VehicleController
         unset($types[array_search(VehicleType::OTHER, $types, true)]);
         $types[] = VehicleType::OTHER;
 
+        $appliedFilters = [
+            'factions' => $request->getFactions(),
+            'manufacturers' => $request->getManufacturers(),
+            'media' => $request->getMedia(),
+            'lines' => $request->getLines(),
+            'categories' => $request->getCategories(),
+            'types' => $request->getTypes(),
+        ];
+
         return view('public.vehicles.list', [
-            'appliedFilters' => [
-                'factions' => $request->getFactions(),
-                'manufacturers' => $request->getManufacturers(),
-                'media' => $request->getMedia(),
-                'lines' => $request->getLines(),
-                'categories' => $request->getCategories(),
-                'types' => $request->getTypes(),
-            ],
+            'appliedFilters' => $appliedFilters,
+            'appliedFiltersCount' => count(array_filter($appliedFilters)),
             'vehicles' => $vehicles,
             'factions' => Faction::dropdownList(columnAsKey: 'slug'),
             'manufacturers' => Manufacturer::dropdownList(columnAsKey: 'slug'),

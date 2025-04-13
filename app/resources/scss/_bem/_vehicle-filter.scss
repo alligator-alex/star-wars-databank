@@ -1,10 +1,6 @@
 .vehicle-filter {
     margin-bottom: 1rem;
 
-    &__title {
-        margin-bottom: 1rem;
-    }
-
     &__toggle {
         align-items: center;
         color: $dark-grey;
@@ -14,6 +10,7 @@
         font-size: 1.25rem;
         font-weight: 500;
         justify-content: start;
+        letter-spacing: 0.1rem;
         text-transform: uppercase;
         transition-duration: 0.2s;
         transition-property: color;
@@ -21,6 +18,8 @@
         vertical-align: top;
 
         &-label {
+            display: flex;
+
             &::before {
                 content: attr(data-show-label);
                 vertical-align: text-bottom;
@@ -32,21 +31,40 @@
                 color: $black;
                 content: attr(data-applied-filters-count);
                 display: inline-block;
-                font-size: 0.7em;
+                font-size: 0.7rem;
                 font-weight: 500;
                 height: 1rem;
                 line-height: 1rem;
-                margin: 0 0 0 0.4em;
+                margin: 0 0 0 0.4rem;
                 overflow: hidden;
                 text-align: center;
-                vertical-align: super;
+                transform: translateY(-0.4rem);
                 visibility: visible;
                 width: 1rem;
+            }
+
+            &[data-applied-filters-count="0"]::after {
+                display: none;
+                visibility: hidden;
             }
         }
 
         &:hover {
             color: $blue;
+
+            .burger-menu-icon {
+                width: 1.75rem;
+            }
+
+            .burger-menu-icon__item {
+                width: 100% !important;
+            }
+        }
+
+        &.is-active {
+            .vehicle-filter__toggle-label::before {
+                content: attr(data-hide-label);
+            }
 
             .burger-menu-icon {
                 width: 1.75rem;
@@ -93,22 +111,8 @@
         visibility: hidden;
     }
 
-    #filter-controls-toggle:checked ~ .vehicle-filter__title .vehicle-filter__toggle .vehicle-filter__toggle-label::before {
-        content: attr(data-hide-label);
-    }
-
-    #filter-controls-toggle:checked ~ .vehicle-filter__title .vehicle-filter__toggle .vehicle-filter__toggle-label::after,
-    .vehicle-filter__toggle-label[data-applied-filters-count="0"]::after {
+    #filter-controls-toggle:checked ~ .vehicle-filter__title .vehicle-filter__toggle .vehicle-filter__toggle-label::after {
         visibility: hidden;
-    }
-
-    #filter-controls-toggle:checked ~ .vehicle-filter__title .vehicle-filter__toggle .burger-menu-icon {
-        width: 1.75rem;
-    }
-
-    #filter-controls-toggle:checked ~ .vehicle-filter__title .vehicle-filter__toggle .burger-menu-icon__item {
-        background-color: $blue;
-        width: 100% !important;
     }
 
     &__controls {
@@ -119,6 +123,12 @@
         @media(min-width: $desktop-min) {
             gap: 1rem;
             grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+
+    &.is-active {
+        .vehicle-filter__controls {
+            display: grid;
         }
     }
 
@@ -138,11 +148,11 @@
     .ts-wrapper {
         .ts-control {
             input {
-                padding-left: 1.5em;
+                padding-left: 1.5rem;
             }
 
             .item + input {
-                padding-left: 0.8em;
+                padding-left: 0.8rem;
             }
         }
 
@@ -164,7 +174,7 @@
 
         .item {
             &:first-child {
-                margin-left: 1.5em;
+                margin-left: 1.5rem;
             }
         }
     }
@@ -182,6 +192,7 @@
                 line-height: 1;
                 position: absolute;
                 top: 10px;
+                transform: translateY(-0.1rem);
                 transition: color 0.2s ease-in-out;
                 user-select: none;
                 z-index: 0;

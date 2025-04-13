@@ -41,25 +41,6 @@ Breadcrumbs::add($vehicle->name, VehicleRouteName::ONE->value, $vehicle->slug);
                     </a>
                 @endif
                 <h1>{{ $vehicle->name }}</h1>
-
-                @if ($vehicle->otherFactions->isNotEmpty())
-                    <ul class="vehicle-detail__other-factions">
-                        @foreach ($vehicle->otherFactions as $i => $faction)
-                            <li class="vehicle-detail__other-factions-item wow fadeInRight"
-                                data-wow-delay="{{ ($i * 100) + 100 }}ms">
-                                <a href="{{ route(VehicleRouteName::LIST, ['faction[]' => $faction->slug], false) }}"
-                                   class="vehicle-detail__faction vehicle-detail__faction--other"
-                                   title="{{ __('Also used by the') }} {{ $faction->name }}">
-                                    <div class=" faction-emblem faction-emblem--{{ $faction->slug }}">
-                                        <svg>
-                                            <use xlink:href="#emblem-{{ $faction->slug }}"></use>
-                                        </svg>
-                                    </div>
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
-                @endif
             </div>
 
             <noindex>
@@ -91,7 +72,33 @@ Breadcrumbs::add($vehicle->name, VehicleRouteName::ONE->value, $vehicle->slug);
             </picture>
         @endif
 
-        <div class="vehicle-detail__info wow fadeIn" data-wow-delay="200ms">
+        <div class="vehicle-detail__info wow fadeInUp" data-wow-delay="200ms">
+            @if ($vehicle->otherFactions->isNotEmpty())
+                <div class="vehicle-detail__data vehicle-detail__data--other-factions">
+                    <h3>{{ __('Also used by') }}:</h3>
+                    <ul class="factions">
+                        @foreach ($vehicle->otherFactions as $i => $faction)
+                            <li class="vehicle-detail__other-factions-item wow fadeInRight"
+                                data-wow-delay="{{ ($i * 100) + 100 }}ms">
+                                <a href="{{ route(VehicleRouteName::LIST, ['faction[]' => $faction->slug], false) }}"
+                                   class="vehicle-detail__faction vehicle-detail__faction--other"
+                                   title="{{ $faction->name }}">
+                                    <div class="faction-emblem faction-emblem--{{ $faction->slug }}">
+                                        <svg>
+                                            <use xlink:href="#emblem-{{ $faction->slug }}"></use>
+                                        </svg>
+                                    </div>
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <div class="vehicle-detail__description wow fadeInUp">
+                {!! $vehicle->description !!}
+            </div>
+
             <div class="vehicle-detail__meta">
                 <div class="rogue-links">
                     <span class="rogue-links__item rogue-links__item--category wow fadeInRight" data-wow-delay="300ms">
@@ -127,10 +134,8 @@ Breadcrumbs::add($vehicle->name, VehicleRouteName::ONE->value, $vehicle->slug);
                             </span>
                         </span>
                     @endif
-                </div>
 
-                @if ($vehicle->manufacturers->isNotEmpty())
-                    <div class="rogue-links">
+                    @if ($vehicle->manufacturers->isNotEmpty())
                         <span class="rogue-links__item wow fadeInRight" data-wow-delay="600ms">
                             <span class="rogue-links__label">
                                 <span class="rogue-links__icon rogue-icon"><noindex>r1</noindex></span> {{ __('Manufacturer') }}:
@@ -145,28 +150,24 @@ Breadcrumbs::add($vehicle->name, VehicleRouteName::ONE->value, $vehicle->slug);
                                 @endif
                             @endforeach
                         </span>
-                    </div>
-                @endif
-            </div>
-
-            <div class="vehicle-detail__description wow fadeInUp">
-                {!! $vehicle->description !!}
+                    @endif
+                </div>
             </div>
 
             @php
-                $techSpecs = $vehicle->getTechnicalSpecifications()->getItems();
+            $techSpecs = $vehicle->getTechnicalSpecifications()->getItems();
             @endphp
             @if (!empty($techSpecs))
-                <div class="vehicle-detail__tech-specs">
-                    <h2 class="wow fadeInUp">{{ __('Technical Specifications') }}</h2>
-                    <ul>
+                <div class="vehicle-detail__data">
+                    <h2 class="wow fadeInUp">{{ __('Technical Specifications') }}:</h2>
+                    <ul class="vehicle-detail__list">
                         @php
-                            $i = 0;
+                        $i = 0;
                         @endphp
                         @foreach ($techSpecs as $name => $value)
-                            <li class="wow fadeInUp" data-wow-delay="{{ ($i * 100) + 100 }}ms">{{ $name }}: <strong>{{ $value }}</strong></li>
+                            <li class="wow fadeInRight" data-wow-delay="{{ ($i * 100) + 100 }}ms">{{ $name }}: <strong>{{ $value }}</strong></li>
                             @php
-                                $i++;
+                            $i++;
                             @endphp
                         @endforeach
                     </ul>
@@ -174,8 +175,8 @@ Breadcrumbs::add($vehicle->name, VehicleRouteName::ONE->value, $vehicle->slug);
             @endif
 
             @if ($vehicle->appearances->isNotEmpty())
-                <div class="vehicle-detail__appearances appearances">
-                    <h2 class="wow fadeInUp">{{ __('Appearances') }}</h2>
+                <div class="vehicle-detail__data appearances">
+                    <h2 class="wow fadeInUp">{{ __('Appeared in') }}:</h2>
                     <ul class="appearances__list js-appearances-slider">
                         @foreach ($vehicle->appearances as $appearance)
                             <li class="appearances__wrapper">

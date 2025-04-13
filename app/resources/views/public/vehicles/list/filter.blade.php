@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 
 /**
  * @var array<string, string[]> $appliedFilters
+ * @var int $appliedFiltersCount
  * @var array<int, string> $factions
  * @var array<int, string> $manufacturers
  * @var array<string, array<int, string>> $media
@@ -14,25 +15,8 @@ use Illuminate\Support\Str;
  * @var VehicleType[] $types
  */
 @endphp
-<section class="container">
-    <form class="vehicle-filter js-vehicle-filter" action="{{ route(name: VehicleRouteName::LIST, absolute: false) }}">
-        <input id="filter-controls-toggle" type="checkbox" @if (!empty(array_filter($appliedFilters))) checked @endif>
-        <div class="vehicle-filter__title">
-            <label class="vehicle-filter__toggle wow fadeInUp"
-                   for="filter-controls-toggle"
-                   data-wow-delay="100ms">
-                <span class="burger-menu-icon">
-                    <span class="burger-menu-icon__item"></span>
-                    <span class="burger-menu-icon__item"></span>
-                    <span class="burger-menu-icon__item"></span>
-                </span>
-                <span class="vehicle-filter__toggle-label js-filter-toggle"
-                      data-show-label="{{ __('Show filters') }}"
-                      data-hide-label="{{ __('Hide filters') }}"
-                      data-applied-filters-count="{{ count(array_filter($appliedFilters)) }}"></span>
-            </label>
-        </div>
-
+<section class="container wow fadeInUp" data-wow-delay="150ms">
+    <form class="vehicle-filter js-vehicle-filter @if ($appliedFiltersCount > 0) is-active @endif" action="{{ route(name: VehicleRouteName::LIST, absolute: false) }}">
         <div class="vehicle-filter__controls">
             <div class="vehicle-filter__control">
                 <select multiple name="faction[]"
@@ -49,7 +33,7 @@ use Illuminate\Support\Str;
                         class="vehicle-filter__input vehicle-filter__input--media js-filter-input"
                         data-placeholder="{{ __('Media') }}">
                     @foreach ($media as $groupName => $items)
-                        <optgroup label="{{ $groupName }}">
+                        <optgroup label="{{ $groupName }}:">
                             @foreach ($items as $slug => $name)
                                 <option value="{{ $slug }}"
                                         @if (in_array($slug, $appliedFilters['media'], true)) selected @endif>{{ $name }}</option>

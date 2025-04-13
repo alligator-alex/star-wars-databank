@@ -1,7 +1,5 @@
 import TomSelect from "tom-select";
 
-export * from "../global/index";
-
 interface DataStorage {
     set(selector: string): void;
     get(selector: string): string;

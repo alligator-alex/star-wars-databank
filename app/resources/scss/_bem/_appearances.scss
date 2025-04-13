@@ -1,7 +1,10 @@
 .appearances {
     &__item {
+        border-radius: 1rem;
         display: block;
-        text-align: center;
+        overflow: hidden;
+        position: relative;
+        text-align: left;
         text-decoration: none;
         width: 150px;
 
@@ -10,50 +13,69 @@
         }
 
         &:hover {
-            .appearances__poster {
-                outline-color: $yellow;
+            img {
+                filter: none;
+                transform: scale(1.05);
+            }
 
-                img {
-                    filter: none;
-                    transform: scale(1.05);
-                }
+            .appearances__info {
+                opacity: 1;
             }
         }
     }
 
-    &__poster {
-        border-radius: 5px;
-        box-shadow: 0 2px 4px 2px rgba(0, 0, 0, 0.1);
-        margin-bottom: 1rem;
-        outline: 4px solid transparent;
-        overflow: hidden;
-        padding-top: 145%;
-        position: relative;
-        transition: outline-color 0.2s ease-in-out;
+    img {
+        aspect-ratio: 2/3;
+        filter: grayscale(0.5);
+        object-fit: cover;
+        object-position: bottom;
+        transition-duration: 0.2s;
+        transition-property: filter, transform;
+        transition-timing-function: ease-in-out;
+    }
 
-        img {
-            filter: grayscale(0.5);
-            height: 100%;
-            left: 0;
-            object-fit: cover;
-            object-position: bottom;
-            position: absolute;
-            top: 0;
-            transition-duration: 0.2s;
-            transition-property: filter, transform;
-            transition-timing-function: ease-in-out;
-            width: 100%;
-        }
+    &__info {
+        background: linear-gradient(180deg, $black-10pct-transparent 30%, transparent);
+        opacity: 0;
+        padding: 1rem;
+        position: absolute;
+        top: 0;
+        transition: opacity 0.2s ease-in-out;
+        width: 100%;
     }
 
     &__name {
+        color: $white;
         font-weight: 500;
-        text-transform: uppercase;
+        line-height: 1.15;
+    }
+
+    &__meta {
+        align-items: flex-start;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.2rem;
+        margin-top: 0.2rem;
+    }
+
+    &__type,
+    &__release-date {
+        background-color: $blue;
+        border-radius: 1rem;
+        color: $white;
+        font-size: 0.75rem;
+        font-weight: 500;
+        line-height: 1rem;
+        padding: 0.1rem 0.5rem;
+    }
+
+    &__type {
+        background-color: $yellow;
+        color: $black;
     }
 
     &__release-date {
-        font-size: small;
-        vertical-align: super;
+        background-color: $blue;
     }
 
     &__list {
@@ -63,7 +85,7 @@
 
         &.flickity-enabled {
             display: block;
-            padding-bottom: 80px;
+            padding-bottom: 2rem;
         }
 
         .flickity-viewport {
@@ -83,10 +105,6 @@
             }
         }
 
-        .flickity-slider {
-            padding: 4px 0;
-        }
-
         .flickity-button {
             &:focus {
                 box-shadow: none;
@@ -98,49 +116,35 @@
         }
 
         .flickity-prev-next-button {
-            background-color: $light-grey;
-            border-radius: 50%;
-            bottom: 0;
-            top: unset;
-            transform: none;
-            transition-duration: 0.2s;
-            transition-property: background-color, opacity;
-            transition-timing-function: ease-in-out;
-
-            &.previous {
-                left: 0;
-            }
-
-            &.next {
-                right: 0;
-            }
+            display: none;
         }
 
         .flickity-page-dots {
             bottom: 0;
-            left: 50px;
-            right: 50px;
-            width: auto;
+            width: 100%;
         }
 
         .flickity-page-dot {
             background-color: $black-80pct-transparent;
-            border-radius: 2em;
-            height: 8px;
-            margin: 0 5px;
-            transition: background-color 0.2s ease-in-out;
-            width: 20px;
+            border-radius: 1rem;
+            height: 0.6rem;
+            margin: 0 0.2rem;
+            transition-duration: 0.2s;
+            transition-property: background-color, width;
+            transition-timing-function: ease-in-out;
+            width: 0.6rem;
 
             &:focus {
                 box-shadow: none;
             }
 
             &:hover {
-                background: $white;
+                background: $blue;
             }
 
             &.is-selected {
                 background-color: $yellow;
+                width: 2rem;
             }
         }
     }

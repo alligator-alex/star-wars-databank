@@ -29,6 +29,7 @@ a:hover {
 }
 
 .page-wrapper {
+    background: $primary-grey;
     box-shadow: 0 2px 4px 2px rgba(0, 0, 0, 0.1);
     margin-bottom: 8rem;
     min-height: 100vh;
@@ -39,23 +40,6 @@ a:hover {
     @media(min-width: $desktop-min) {
         margin-bottom: 4rem;
         padding: 2.5rem 0;
-    }
-
-    &__bg-container {
-        height: 100%;
-        left: 0;
-        position: absolute;
-        top: 0;
-        width: 100%;
-        z-index: -1;
-    }
-
-    &__bg {
-        background: $gradient-main;
-        height: 100vh;
-        position: sticky;
-        top: 0;
-        width: 100%;
     }
 
     .wow {
@@ -75,7 +59,7 @@ a:hover {
     padding: 0 1rem;
 
     @media(min-width: $desktop-min) {
-        padding: 0 5rem;
+        padding: 0 9rem;
     }
 }
 
@@ -116,9 +100,9 @@ a:hover {
         padding: 1rem;
 
         @media(min-width: $desktop-min) {
-            padding: 0 5rem;
-            height: 4rem;
             flex-direction: row;
+            height: 4rem;
+            padding: 0 9rem;
         }
     }
 }
@@ -153,11 +137,12 @@ h2, .h2,
 h3, .h3 {
     font-family: $font-family-title;
     font-weight: 500;
-    text-transform: uppercase;
 }
 
 h1, .h1 {
     font-size: 1.75rem;
+    letter-spacing: 0.15rem;
+    text-transform: uppercase;
 
     @media(min-width: $desktop-min) {
         font-size: 2.75rem;
@@ -166,10 +151,6 @@ h1, .h1 {
 
 h2, .h2 {
     font-size: 1.5rem;
-
-    @media(min-width: $desktop-min) {
-        font-size: 1.75rem;
-    }
 }
 
 h3, .h3 {

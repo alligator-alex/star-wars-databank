@@ -4,9 +4,8 @@
 
     .ts-control {
         align-items: center;
-        background-color: #c5c5c5;
-        border: 2px solid $black-90pct-transparent;
-        border-radius: 5px;
+        background-color: $white;
+        border-radius: 1rem;
         cursor: pointer;
         display: flex;
         justify-content: start;
@@ -20,23 +19,12 @@
 
     &:hover {
         .ts-control {
-            background-color: $dark-grey;
-        }
-
-        .clear-button {
-            color: $light-grey;
-        }
-
-        input {
-            &::placeholder {
-                color: $light-grey;
-            }
+            outline-color: $yellow;
         }
     }
 
     &.focus {
         .ts-control {
-            border-color: transparent;
             outline-color: $yellow;
 
             input {
@@ -46,21 +34,21 @@
     }
 
     .clear-button {
-        align-items: center;
         border-radius: 5px;
         cursor: pointer;
         display: none;
-        height: 2rem;
-        justify-content: center;
+        font-size: 1.2rem;
+        height: 1.2rem;
+        line-height: 0.8rem;
         margin: 0;
         position: absolute;
-        right: 0;
+        right: 0.4rem;
         text-align: center;
         top: 50%;
         transform: translateY(-50%);
         transition: 0.2s ease-in-out;
         transition-property: background-color, color;
-        width: 2rem;
+        width: 1.2rem;
 
         &:hover {
             background-color: $yellow;
@@ -71,13 +59,13 @@
     input {
         background: none;
         border: 0;
-        color: $white;
+        color: $black;
         cursor: pointer;
         flex: 1 0 30%;
         font-size: 1rem;
         line-height: 1;
         min-width: auto;
-        padding: 0.4em 0.8em;
+        padding: 0.4rem 0.8rem;
         position: relative;
         text-overflow: ellipsis;
         z-index: 1;
@@ -94,41 +82,41 @@
 
     &.has-items {
         .ts-control {
-            padding: 0.4em 0 0;
+            padding: 0.4rem 0 0;
         }
 
         input {
-            margin: 0 0 0.3em 0.4em;
+            margin: 0 0 0.3rem 0.4rem;
             padding: 0;
         }
 
         .clear-button {
-            display: flex;
+            display: block;
         }
     }
 
     &.plugin-clear_button {
         .ts-control {
-            padding-right: 2em;
+            padding-right: 2rem;
         }
     }
 
     .item {
         align-items: center;
         background-color: $yellow;
-        border-radius: 5px;
+        border-radius: 1rem;
         color: $black;
         font-weight: 500;
-        margin: 0 0 0.3em 0.4em;
+        margin: 0 0 0.3rem 0.4rem;
         overflow: hidden;
-        padding: 0 1.5em 0 0.4em;
+        padding: 0 1.5rem 0 0.4rem;
         position: relative;
         text-overflow: ellipsis;
         white-space: nowrap;
 
         &--dummy {
             flex-shrink: 0;
-            padding-right: 0.4em;
+            padding-right: 0.4rem;
         }
 
         &:first-child {
@@ -137,8 +125,8 @@
 
         .remove {
             height: 100%;
-            margin-left: 0.2em;
-            padding: 0 0.4em;
+            margin-left: 0.2rem;
+            padding: 0 0.4rem;
             position: absolute;
             right: 0;
             text-decoration: none;
@@ -154,12 +142,10 @@
     }
 
     .ts-dropdown {
-        background-color: #cecece;
-        border: 2px solid rgba(0 0 0 / 5%);
-        border-bottom-left-radius: 3px;
-        border-bottom-right-radius: 3px;
+        background-color: $light-grey;
+        border-radius: 1rem;
         border-top: 0;
-        box-shadow: 0 2px 4px 2px $black-90pct-transparent;
+        box-shadow: 0 50px 100px 0 $black-80pct-transparent;
         line-height: 1.2;
         overflow: hidden;
         position: absolute;
@@ -175,11 +161,9 @@
         }
 
         .optgroup {
-            border-bottom: 1px solid $black-50pct-transparent;
-            margin-bottom: 1em;
+            margin-bottom: 0.5rem;
 
             &:last-child {
-                border-bottom: 0;
                 margin-bottom: 0;
             }
 
@@ -192,29 +176,25 @@
 
         .optgroup-header {
             color: $dark-grey;
+            font-family: $font-family-title;
             font-weight: 500;
-            padding: 0.4em 0.8em;
-            text-transform: uppercase;
+            padding: 0.4rem;
         }
 
         .option {
             cursor: pointer;
-            padding: 0.4em 0.8em 0.4em 2em;
+            padding: 0.4rem 0.8rem 0.4rem 2rem;
             position: relative;
             transition: 0.2s ease-in-out;
             transition-property: background-color, color;
 
             &:nth-child(even) {
-                background-color: #c5c5c5;
+                background-color: $light-grey-alt;
             }
 
             &:hover {
                 background-color: $yellow;
                 color: $black;
-
-                &::after {
-                    background-color: $dark-grey;
-                }
             }
 
             &::before,
@@ -225,26 +205,37 @@
             }
 
             &::before {
-                border: 2px solid $black-90pct-transparent;
-                border-radius: 0.2rem;
-                height: 1em;
-                left: 0.4em;
-                top: 0.5em;
-                width: 1em;
+                border: 2px solid $black-50pct-transparent;
+                border-radius: 0.25rem;
+                height: 0.8rem;
+                left: 0.6rem;
+                top: 0.6rem;
+                transition: background-color 0.2s ease-in-out;
+                width: 0.8rem;
             }
 
             &::after {
-                background-color: $blue;
+                background-color: $yellow;
                 border-radius: 0.1rem;
                 display: none;
-                height: 0.6em;
-                left: 0.6em;
-                top: 0.7em;
+                height: 0.5rem;
+                left: 0.75rem;
+                top: 0.75rem;
                 transition: background-color 0.2s ease-in-out;
-                width: 0.6em;
+                width: 0.5rem;
             }
 
             &.selected {
+                color: $blue;
+
+                &:hover {
+                    color: $black;
+                }
+
+                &::before {
+                    background-color: $dark-grey;
+                }
+
                 &::after {
                     display: block;
                 }
@@ -252,7 +243,7 @@
         }
 
         .no-results {
-            padding: 0.2em 0.5em;
+            padding: 0.2rem 0.5rem;
         }
     }
 }
