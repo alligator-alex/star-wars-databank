@@ -9,6 +9,8 @@ import (
 	"sw-vehicles/internal/app/helpers"
 )
 
+// FileLogger is a wrapper for fmt.Println() function,
+// but it also writes the message to a file.
 type FileLogger struct {
 	path     string
 	isSilent bool
@@ -31,6 +33,7 @@ func NewFileLogger(fileName string, isSilent bool) FileLogger {
 	}
 }
 
+// Log prints a message to the file.
 func (logger FileLogger) Log(message ...any) {
 	logFile, err := os.OpenFile(logger.path, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
 
@@ -38,7 +41,12 @@ func (logger FileLogger) Log(message ...any) {
 		log.Panic(err)
 	}
 
-	defer logFile.Close()
+	defer func(logFile *os.File) {
+		err := logFile.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(logFile)
 
 	log.SetOutput(logFile)
 

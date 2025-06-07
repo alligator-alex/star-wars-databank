@@ -19,6 +19,6 @@
 
     <p class="error-quote wow fadeInUp" data-wow-delay="400ms">{{ __('Impossible, perhaps the archives are incomplete.') }}</p>
 
-    <a href="/" class="yellow-button wow fadeInUp" data-wow-delay="400ms">{{ __('Go to home page') }}</a>
+    <a href="/" class="button button--yellow wow fadeInUp" data-wow-delay="400ms">{{ __('Go to home page') }}</a>
 </section>
 @endsection

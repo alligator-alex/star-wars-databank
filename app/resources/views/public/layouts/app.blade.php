@@ -1,6 +1,10 @@
 @php
 use App\Modules\Core\Public\Components\Breadcrumbs;
+use App\Modules\Databank\Common\Enums\CookieName;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Cookie;
+
+$cookieConsent = (Cookie::get(CookieName::COOKIE_CONSENT->value) === 'Y');
 @endphp
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -34,6 +38,13 @@ use Illuminate\Support\Facades\Route;
             {!! Breadcrumbs::render() !!}
         @endif
         @yield('content')
+
+        @if (!$cookieConsent)
+            <div class="cookie-modal js-cookie-modal">
+                {!! __('Cookie consent') !!}
+                <button class="button js-cookie-consent" title="{{ __('Give consent') }}">{{ __('Roger Roger') }}</button>
+            </div>
+        @endif
     </main>
 </div>
 

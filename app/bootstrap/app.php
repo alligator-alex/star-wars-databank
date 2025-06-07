@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Modules\Core\Common\Helpers\ConsoleCommandsHelper;
+use App\Modules\Databank\Common\Enums\CookieName;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -15,8 +16,12 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withCommands(ConsoleCommandsHelper::getPathsInsideModules())
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->encryptCookies(except: [
+            CookieName::SKIP_INTRO->value,
+            CookieName::COOKIE_CONSENT->value,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
-    })->create();
+    })
+    ->create();

@@ -2,7 +2,7 @@ package helpers
 
 import "strings"
 
-// Concatenate multiple strings into one.
+// ConcatStrings concatenate multiple strings into one.
 func ConcatStrings(values ...string) string {
 	var builder strings.Builder
 
@@ -13,10 +13,10 @@ func ConcatStrings(values ...string) string {
 	return builder.String()
 }
 
-// Pad a string to the right to a certain length with another string.
-func PadStringRight(str string, length int, padStr string) string {
-	if len(padStr) == 0 {
-		padStr = " "
+// PadStringRight pads a string to the right to a certain length with given symbol.
+func PadStringRight(str string, length int, symbol string) string {
+	if len(symbol) == 0 {
+		symbol = " "
 	}
 
 	diff := length - len(str)
@@ -28,7 +28,7 @@ func PadStringRight(str string, length int, padStr string) string {
 
 	builder.WriteString(str)
 	for i := 1; i < diff; i++ {
-		builder.WriteString(padStr)
+		builder.WriteString(symbol)
 	}
 
 	return builder.String()

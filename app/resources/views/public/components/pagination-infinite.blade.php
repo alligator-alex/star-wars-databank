@@ -9,7 +9,7 @@
         <a rel="next"
            aria-label="{{ __('Next') }}"
            data-page-num="{{ $paginator->currentPage() + 1 }}"
-           class="yellow-button wow fadeInUp"
+           class="button button--yellow wow fadeInUp"
            data-wow-delay="100ms">
             <span class="rogue-icon"><noindex>1</noindex></span>
             <span>{{ __('More') }} ({{ $paginator->total() - $paginator->lastItem() }})</span>

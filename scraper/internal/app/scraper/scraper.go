@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"sw-vehicles/internal/app/appearance"
 	"sw-vehicles/internal/app/core"
 	"sw-vehicles/internal/app/helpers"
 	"sw-vehicles/internal/app/logger"
@@ -18,14 +19,11 @@ import (
 	"github.com/gocolly/colly/v2/queue"
 )
 
-type PageTemplate string
-
 type BrokerClient interface {
 	Publish(body string)
 	Stop()
 }
 
-// see isErrorAlreadyVisited() function
 var alreadyVisitedError *colly.AlreadyVisitedError
 
 type Scraper struct {
@@ -38,17 +36,22 @@ type Scraper struct {
 	pageNum             int
 	totalVisited        int
 	totalScraped        int
+	appearanceParser    appearance.Parser
+	vehicleParser       vehicle.Parser
 }
 
 func NewScraper(brokerClient BrokerClient) Scraper {
 	scraper := Scraper{
-		logger:       logger.NewFileLogger("scraper.log", false),
-		brokerClient: brokerClient,
+		logger:           logger.NewFileLogger("scraper.log", false),
+		brokerClient:     brokerClient,
+		appearanceParser: appearance.NewParser(),
+		vehicleParser:    vehicle.NewParser(),
 	}
 
 	return scraper
 }
 
+// Run starts scraping of every page from the Wookieepedia.
 func (s *Scraper) Run(continueFrom string) {
 	s.navPageCollector = s.newCollector(0)
 	s.navPageQueue = s.newQueue(1)
@@ -60,8 +63,15 @@ func (s *Scraper) Run(continueFrom string) {
 
 	s.logger.Log("Start scraping")
 
-	s.navPageQueue.AddURL(firstNavPageUrl + continueFrom)
-	s.navPageQueue.Run(s.navPageCollector)
+	err := s.navPageQueue.AddURL(firstNavPageUrl + continueFrom)
+	if err != nil {
+		s.logger.Log("Unable to add Nav page URL:", err)
+	}
+
+	err = s.navPageQueue.Run(s.navPageCollector)
+	if err != nil {
+		s.logger.Log("Unable to run nav page queue:", err)
+	}
 
 	s.stop()
 
@@ -79,9 +89,14 @@ func (s *Scraper) newCollector(randomDelay int) *colly.Collector {
 	)
 
 	if randomDelay > 0 {
-		collector.Limit(&colly.LimitRule{
+		err := collector.Limit(&colly.LimitRule{
 			RandomDelay: time.Duration(randomDelay) * time.Second,
 		})
+
+		if (err != nil) && !errors.Is(err, colly.ErrNoPattern) {
+			s.logger.Log("Unable to create collector:", err)
+			panic(err)
+		}
 	}
 
 	extensions.RandomUserAgent(collector)
@@ -150,15 +165,10 @@ func (s *Scraper) registerDetailPageCollectorEvents() {
 	})
 }
 
-func (s *Scraper) findPageInfobox(page *colly.HTMLElement) *goquery.Selection {
-	return page.DOM.Find("aside.portable-infobox")
-}
-
-// Collect all links leading to detail pages.
 func (s *Scraper) scrapeNavPage(page *colly.HTMLElement) {
 	s.logger.Log("Collecting detail pages...")
 
-	detailPagesUrls := []string{}
+	var detailPagesUrls []string
 	page.ForEach(".mw-allpages-body a[href]", func(i int, el *colly.HTMLElement) {
 		detailPagesUrls = append(detailPagesUrls, el.Request.AbsoluteURL(el.Attr("href")))
 	})
@@ -172,11 +182,21 @@ func (s *Scraper) scrapeNavPage(page *colly.HTMLElement) {
 	s.logger.Log("Found", detailPagesFound, "more pages")
 
 	for _, u := range detailPagesUrls {
-		s.detailPageQueue.AddURL(u)
+		err := s.detailPageQueue.AddURL(u)
+		if err != nil {
+			s.logger.Log("Unable to add detail page URL:", err)
+			continue
+		}
 	}
 
 	s.logger.Log("Starting detail page queue")
-	s.detailPageQueue.Run(s.detailPageCollector)
+
+	err := s.detailPageQueue.Run(s.detailPageCollector)
+	if err != nil {
+		s.logger.Log("Unable to run detail page queue:", err)
+		return
+	}
+
 	s.detailPageQueue.Stop()
 	s.logger.Log("Detail page queue completed")
 
@@ -208,8 +228,18 @@ func (s *Scraper) scrapeNavPage(page *colly.HTMLElement) {
 			s.logger.Log("Found next page:", nextPageUrl)
 
 			s.navPageQueue.Stop()
-			s.navPageQueue.AddURL(nextPageUrl)
-			s.navPageQueue.Run(s.navPageCollector)
+
+			err := s.navPageQueue.AddURL(nextPageUrl)
+			if err != nil {
+				s.logger.Log("Unable to add next page URL:", err)
+				return
+			}
+
+			err = s.navPageQueue.Run(s.navPageCollector)
+			if err != nil {
+				s.logger.Log("Unable to run nav page queue:", err)
+				return
+			}
 		}
 	})
 
@@ -226,557 +256,68 @@ func (s *Scraper) scrapeDetailPage(page *colly.HTMLElement) {
 		return
 	}
 
-	appearances := s.parseAppearances(page)
+	appearances := s.collectAppearances(page)
 	if len(appearances) == 0 {
 		s.logger.Log("-", paddedUrl, "skipped (no appearances)")
 		return
 	}
 
-	infobox := s.findPageInfobox(page)
+	dto := s.vehicleParser.Parse(page, appearances)
 
-	dto := vehicle.VehicleDTO{
-		Name:                    s.parsePageTitle(page),
-		Category:                s.parseVehicleCategory(infobox),
-		Line:                    core.NullableString(s.parseVehicleLine(infobox)),
-		Type:                    core.NullableString(s.parseVehicleType(infobox)),
-		ImageURL:                s.parseImageUrl(infobox),
-		Description:             s.parsePageText(page),
-		URL:                     page.Request.URL.Scheme + "://" + page.Request.URL.Host + page.Request.URL.Path,
-		RelatedURL:              core.NullableString(s.parseCanonRelatedURL(page)),
-		Manufacturers:           s.parseVehicleManufacturers(infobox),
-		Factions:                s.parseVehicleFactions(infobox),
-		TechnicalSpecifications: s.parseVehicleTechnicalSpecifications(infobox),
-		IsCanon:                 s.isCanonPage(page),
-		Appearances:             appearances,
-	}
-
-	data, err := json.Marshal(dto)
-	if err != nil {
-		s.logger.Log("-", paddedUrl, "unable to marshal JSON:", err)
+	if err := s.publishToBroker(dto); err != nil {
+		s.logger.Log("-", paddedUrl, "unable to publish to broker:", err)
 		return
 	}
-
-	s.brokerClient.Publish(string(data))
 
 	s.totalScraped++
 	s.logger.Log("-", paddedUrl, "scraped")
 }
 
-func (s *Scraper) scrapeWorkOfArtPage(page *colly.HTMLElement) vehicle.AppearanceDTO {
-	if !s.isAppearancePage(page) {
-		return vehicle.AppearanceDTO{}
+func (s *Scraper) publishToBroker(dto interface{}) error {
+	data, err := json.Marshal(dto)
+	if err != nil {
+		return err
 	}
 
-	infobox := s.findPageInfobox(page)
+	s.brokerClient.Publish(string(data))
 
-	dto := vehicle.AppearanceDTO{
-		Name:        s.parsePageTitle(page),
-		URL:         page.Request.URL.String(),
-		ImageURL:    s.parseImageUrl(infobox),
-		Type:        core.NullableString(s.parseWorkOfArtType(infobox)),
-		ReleaseDate: core.NullableString(s.parseWorkOfArtReleaseDate(infobox)),
-	}
-
-	return dto
+	return nil
 }
 
-func (s *Scraper) parseWorkOfArtType(infoboxSelection *goquery.Selection) string {
-	var template string
-
-	url, exists := infoboxSelection.Find(".plainlinks > a").Attr("href")
-	if exists {
-		template = s.parsePageUrlTemplateName(url)
-	}
-
-	switch template {
-	case string(templateMovie):
-		return "Movie"
-	case string(templateTvSeries):
-		return "Series"
-	case string(templateVideoGame):
-		return "Game"
-	case string(templateBook):
-		return "Book"
-	case string(templateComicBook):
-		return "ComicBook"
-	default:
-		return ""
-	}
-}
-
-func (s *Scraper) parseWorkOfArtReleaseDate(infoboxSelection *goquery.Selection) string {
-	dateSelection := infoboxSelection.Find(`div[data-source="release date"]`)
-	if dateSelection.Length() == 0 {
-		dateSelection = infoboxSelection.Find(`div[data-source="first aired"]`)
-	}
-
-	if dateSelection.Length() == 0 {
-		return ""
-	}
-
-	lines := s.parseInfoboxDataSource(dateSelection)
-	if len(lines) == 0 {
-		return ""
-	}
-
-	textParts := strings.Split(lines[0].Name, " (")
-
-	return textParts[0]
-}
-
-func (s *Scraper) parsePageTitle(page *colly.HTMLElement) string {
-	heading := page.DOM.Find("h1#firstHeading")
-	if heading.Length() > 0 {
-		note := heading.Find("small")
-		if note.Length() > 0 {
-			return strings.TrimSpace(strings.Replace(heading.Text(), note.Text(), "", 1))
-		}
-
-		return strings.TrimSpace(heading.Text())
-	}
-
-	infobox := s.findPageInfobox(page)
-
-	heading = infobox.Find(`h2[data-source="name"]`)
-	if heading.Length() > 0 {
-		return strings.TrimSpace(heading.Text())
-	}
-
-	heading = infobox.Find(`h2[data-source="title"]`)
-	if heading.Length() > 0 {
-		return strings.TrimSpace(heading.Text())
-	}
-
-	return "Unknown"
-}
-
-// Get vehicle category based on page template.
-// See:
-// - https://starwars.fandom.com/wiki/Category:Vehicle_infobox_templates;
-// - https://starwars.fandom.com/wiki/Template:Starship_class;
-// - https://starwars.fandom.com/wiki/Template:Space_station.
-func (s *Scraper) parseVehicleCategory(infoboxSelection *goquery.Selection) string {
-	var template string
-
-	url, exists := infoboxSelection.Find(".plainlinks > a").Attr("href")
-	if exists {
-		template = s.parsePageUrlTemplateName(url)
-	}
-
-	switch template {
-	case string(templateAirVehicle):
-		return "Air"
-	case string(templateAquaticVehicle):
-		return "Aquatic"
-	case string(templateGroundVehicle):
-		return "Ground"
-	case string(templateRepulsorliftVehicle):
-		return "Repulsorlift"
-	case string(templateSpaceStation):
-		return "Space station"
-	case string(templateStarshipClass):
-		return "Starship"
-	case string(templateVehicle):
-		return "Other"
-	default:
-		return ""
-	}
-}
-
-func (s *Scraper) parseImageUrl(infoboxSelection *goquery.Selection) string {
-	imageSelection := infoboxSelection.Find(`figure[data-source="image"]`)
-	if imageSelection.Length() == 0 {
-		return ""
-	}
-
-	if href, exists := imageSelection.ChildrenFiltered("a").First().Attr("href"); exists {
-		return href
-	}
-
-	return ""
-}
-
-func (s *Scraper) parseVehicleLine(infoboxSelection *goquery.Selection) string {
-	lineSelection := infoboxSelection.Find(`div[data-source="line"]`)
-	if lineSelection.Length() == 0 {
-		return ""
-	}
-
-	lines := s.parseInfoboxDataSource(lineSelection)
-	if len(lines) == 0 {
-		return ""
-	}
-
-	replacer := strings.NewReplacer(" series", "", "-series", "", " line", "", "-line", "")
-	return replacer.Replace(lines[0].Name)
-}
-
-func (s *Scraper) parseVehicleType(infoboxSelection *goquery.Selection) string {
-	typeSelection := infoboxSelection.Find(`div[data-source="type"]`)
-	if typeSelection.Length() == 0 {
-		return ""
-	}
-
-	types := s.parseInfoboxDataSource(typeSelection)
-	if len(types) == 0 {
-		return ""
-	}
-
-	return types[0].Name
-}
-
-func (s *Scraper) parsePageText(page *colly.HTMLElement) string {
-	var description string
-
-	ignoredNodesNames := []string{
-		"h2",
-		"h3",
-		"h4",
-		"table",
-		"aside",
-		"div",
-		"ul",
-		"ol",
-		"sup",
-		"sub",
-		"figure",
-		"img",
-	}
-
-	// extract all possible text from the page
-	page.DOM.Find(".mw-parser-output").Contents().Each(func(i int, sel *goquery.Selection) {
-		nodeName := goquery.NodeName(sel)
-		for _, ignoredNodeName := range ignoredNodesNames {
-			if nodeName == ignoredNodeName {
-				return
-			}
-		}
-
-		// if there is a paragraph, just grab it's text
-		if nodeName == "p" {
-			description = helpers.ConcatStrings(description, "\n", sel.Text())
-			return
-		}
-
-		// if there is no paragraph, concatenate every child node text
-		description = helpers.ConcatStrings(description, sel.Text())
-	})
-
-	var builder strings.Builder
-
-	// remove all reference links ("[1]", "[2]", etc.)
-	isInReference := false
-	for _, char := range description {
-		symbol := string(char)
-
-		if symbol == "[" {
-			isInReference = true
-		}
-
-		if isInReference && (symbol == "]") {
-			isInReference = false
-			continue
-		}
-
-		if isInReference {
-			continue
-		}
-
-		builder.WriteString(symbol)
-	}
-
-	description = builder.String()
-
-	builder.Reset()
-
-	// remove extra line breaks
-	isPrevCharNewLine := false
-	for _, char := range description {
-		symbol := string(char)
-
-		if isPrevCharNewLine && symbol == "\n" {
-			continue
-		} else if isPrevCharNewLine {
-			isPrevCharNewLine = false
-		}
-
-		if symbol == "\n" {
-			isPrevCharNewLine = true
-		}
-
-		builder.WriteString(symbol)
-	}
-
-	description = builder.String()
-
-	return strings.TrimSpace(description)
-}
-
-func (s *Scraper) parseVehicleManufacturers(infoboxSelection *goquery.Selection) []vehicle.AdditionalDataDTO {
-	manufacturersData := infoboxSelection.Find(`div[data-source="manufacturer"]`)
-	if manufacturersData.Length() == 0 {
-		return []vehicle.AdditionalDataDTO{}
-	}
-
-	return s.parseInfoboxDataSource(manufacturersData)
-}
-
-func (s *Scraper) parseVehicleFactions(infoboxSelection *goquery.Selection) []vehicle.AdditionalDataDTO {
-	factionsData := infoboxSelection.Find(`div[data-source="affiliation"]`)
-	if factionsData.Length() == 0 {
-		return []vehicle.AdditionalDataDTO{}
-	}
-
-	return s.parseInfoboxDataSource(factionsData)
-}
-
-func (s *Scraper) parseVehicleTechnicalSpecifications(infoboxSelection *goquery.Selection) []vehicle.TechSpecDTO {
-	specs := []vehicle.TechSpecDTO{}
-
-	dataSources := map[string]string{
-		"Length":                    "length",
-		"Width":                     "width",
-		"Height":                    "height",
-		"Diameter":                  "diameter",
-		"Maximum acceleration":      "max accel",
-		"Maximum speed":             "max speed",
-		"Maximum atmospheric speed": "max speed",
-		"MGLT":                      "mglt",
-		"Hyperdrive rating":         "hyperdrive",
-	}
-
-	var selector string
-	var dataSelection *goquery.Selection
-	var data []vehicle.AdditionalDataDTO
-
-	for specName, sourceName := range dataSources {
-		selector = helpers.ConcatStrings(`div[data-source="`, sourceName, `"]`)
-		if dataSelection = infoboxSelection.Find(selector); dataSelection.Length() == 0 {
-			continue
-		}
-
-		if data = s.parseInfoboxDataSource(dataSelection); len(data) == 0 {
-			continue
-		}
-
-		textParts := strings.Split(data[0].Name, " (")
-		value := textParts[0]
-
-		replacer := strings.NewReplacer("≈", "", "±", "", ",", "")
-
-		specs = append(specs, vehicle.TechSpecDTO{
-			Name:  specName,
-			Value: strings.TrimSpace(replacer.Replace(value)),
-		})
-	}
-
-	return specs
-}
-
-// Parse [data-source="*"] items from "aside.portable-infobox" element.
-func (s *Scraper) parseInfoboxDataSource(selection *goquery.Selection) []vehicle.AdditionalDataDTO {
-	dto := []vehicle.AdditionalDataDTO{}
-	if selection.Length() == 0 {
-		return dto
-	}
-
-	valueSelection := selection.ChildrenFiltered(".pi-data-value")
-
-	// could be nested <ul>...
-	if list := valueSelection.ChildrenFiltered("ul"); list.Length() > 0 {
-		return s.parseInfoboxNestedList(list)
-	}
-
-	// ...or single text value
-	item := s.parseInfoboxItem(valueSelection)
-	if item.Name != "" {
-		dto = append(dto, item)
-	}
-
-	return dto
-}
-
-// Parse "aside.portable-infobox" nested ul.
-func (s *Scraper) parseInfoboxNestedList(selection *goquery.Selection) []vehicle.AdditionalDataDTO {
-	var items []vehicle.AdditionalDataDTO
-	selection.Children().Each(func(i int, sel *goquery.Selection) {
-		item := s.parseInfoboxItem(sel)
-
-		if item.Name != "" {
-			items = append(items, item)
-		}
-	})
-
-	return items
-}
-
-// Parse "aside.portable-infobox" single text value.
-func (s *Scraper) parseInfoboxItem(selection *goquery.Selection) vehicle.AdditionalDataDTO {
-	var builder strings.Builder
-	selection.Contents().Each(func(i int, sel *goquery.Selection) {
-		nodeName := goquery.NodeName(sel)
-
-		if (nodeName != "#text") && (nodeName != "i") && (nodeName != "span") && (nodeName != "a") {
-			return
-		}
-
-		text := strings.TrimSpace(sel.Text())
-		if text == "" {
-			return
-		}
-
-		if builder.Len() > 0 {
-			builder.WriteString(" ")
-		}
-
-		builder.WriteString(text)
-	})
-
-	value := builder.String()
-
-	// remove all extra spaces around dashes, slashes, commas, brackets etc.
-	replacer := strings.NewReplacer(
-		" ( ", " (",
-		" ) ", ") ",
-		" )", ")",
-		" / ", "/",
-		" /", "/",
-		"/ ", "/",
-		" - ", "-",
-		" -", "-",
-		"- ", "-",
-		" ,", ",",
-	)
-
-	value = strings.TrimSpace(replacer.Replace(value))
-
-	var note string
-	if noteText := selection.Find("small").First().Text(); noteText != "" {
-		note = strings.ToLower(strings.TrimSpace(strings.Trim(noteText, "()")))
-	}
-
-	children := []vehicle.AdditionalDataDTO{}
-	if nestedList := selection.ChildrenFiltered("ul"); nestedList.Length() > 0 {
-		children = s.parseInfoboxNestedList(nestedList)
-	}
-
-	return vehicle.AdditionalDataDTO{
-		Name:     value,
-		Note:     core.NullableString(note),
-		Children: children,
-	}
-}
-
-// Check if Colly returns an error for already visited page.
 func (s *Scraper) isErrorAlreadyVisited(err error) bool {
 	return errors.As(err, &alreadyVisitedError)
 }
 
-func (s *Scraper) parsePageUrlTemplateName(url string) string {
-	return strings.Replace(url, "https://starwars.fandom.com/wiki/Template:", "", 1)
-}
-
-// Check if page contains information about vehicle by searching for template url.
-// Example: https://starwars.fandom.com/wiki/Template:Starship_class.
 func (s *Scraper) isVehiclePage(page *colly.HTMLElement) bool {
-	pageTemplates := []PageTemplate{
-		templateAirVehicle,
-		templateAquaticVehicle,
-		templateGroundVehicle,
-		templateRepulsorliftVehicle,
-		templateSpaceStation,
-		templateStarshipClass,
-		templateVehicle,
+	pageTemplates := []core.PageTemplate{
+		vehicle.TemplateAirVehicle,
+		vehicle.TemplateAquaticVehicle,
+		vehicle.TemplateGroundVehicle,
+		vehicle.TemplateRepulsorliftVehicle,
+		vehicle.TemplateSpaceStation,
+		vehicle.TemplateStarshipClass,
+		vehicle.TemplateVehicle,
 	}
 
-	return s.isPageOneOfTemplates(page, pageTemplates)
+	return s.vehicleParser.IsPageOneOfTemplates(page, pageTemplates)
 }
 
-// Check if page contains information about appearance by searching for template url.
-// Example: https://starwars.fandom.com/wiki/Template:Video_game.
 func (s *Scraper) isAppearancePage(page *colly.HTMLElement) bool {
-	pageTemplates := []PageTemplate{
-		templateMovie,
-		templateTvSeries,
-		templateVideoGame,
-		templateBook,
-		templateComicBook,
+	pageTemplates := []core.PageTemplate{
+		appearance.TemplateMovie,
+		appearance.TemplateTvSeries,
+		appearance.TemplateVideoGame,
+		appearance.TemplateBook,
+		appearance.TemplateComicBook,
 	}
 
-	return s.isPageOneOfTemplates(page, pageTemplates)
+	return s.appearanceParser.IsPageOneOfTemplates(page, pageTemplates)
 }
 
-func (s *Scraper) isPageOneOfTemplates(page *colly.HTMLElement, pageTemplates []PageTemplate) bool {
-	url, exists := s.findPageInfobox(page).Find(".plainlinks > a").Attr("href")
-	if !exists {
-		return false
-	}
+func (s *Scraper) collectAppearances(page *colly.HTMLElement) []appearance.DTO {
+	var appearances []appearance.DTO
 
-	template := s.parsePageUrlTemplateName(url)
-
-	for _, t := range pageTemplates {
-		if string(t) == template {
-			return true
-		}
-	}
-
-	return false
-}
-
-// Check if page contains canon information.
-// First, search for "#canontab", inside find "#canontab-canon_ctcw" (active tab for "Canon") and check if current page url equals active tab url.
-// Otherwise search for "#title-eraicons" element, find image and check if "alt" attribute value ends with "is considered canon".
-func (s *Scraper) isCanonPage(page *colly.HTMLElement) bool {
-	canonTabs := page.DOM.Find("#canontab")
-	if canonTabs.Length() > 0 {
-		activeCanonTab := canonTabs.Find("#canontab-canon_ctcw")
-		if activeCanonTab.Length() == 0 {
-			return false
-		}
-
-		url, exists := activeCanonTab.Find("a[href]").Attr("href")
-		return exists && page.Request.AbsoluteURL(url) == page.Request.URL.String()
-	}
-
-	eraIcons := page.DOM.Find("#title-eraicons")
-	if eraIcons.Length() > 0 {
-		alt, exists := eraIcons.Find("img[src]").Attr("alt")
-
-		return exists && strings.Contains(alt, "is considered canon")
-	}
-
-	return false
-}
-
-// One page could have two instances: one for "canon", other for "legends".
-// They share the same information and can complement each other.
-func (s *Scraper) parseCanonRelatedURL(page *colly.HTMLElement) string {
-	canonTabs := page.DOM.Find("#canontab")
-	if canonTabs.Length() == 0 {
-		return ""
-	}
-
-	var url string
-	canonTabs.Find("td").EachWithBreak(func(index int, tab *goquery.Selection) bool {
-		tabUrl, hasUrl := tab.Find("a[href]").Attr("href")
-		if !hasUrl {
-			return true
-		}
-
-		if page.Request.AbsoluteURL(tabUrl) == page.Request.URL.String() {
-			return true
-		}
-
-		url = page.Request.AbsoluteURL(tabUrl)
-		return false
-	})
-
-	return url
-}
-
-func (s *Scraper) parseAppearances(page *colly.HTMLElement) []vehicle.AppearanceDTO {
-	var appearances []vehicle.AppearanceDTO
-
+	// at first, we must collect appearance items
 	heading := page.DOM.Find("#Appearances")
 	if heading.Length() == 0 {
 		return appearances
@@ -793,20 +334,29 @@ func (s *Scraper) parseAppearances(page *colly.HTMLElement) []vehicle.Appearance
 		return appearances
 	}
 
+	var dto appearance.DTO
+
 	appearancePageCollector := s.newCollector(10)
 
-	var dto vehicle.AppearanceDTO
+	// then we need to register an event to parse target page (when collector receives html)
 	appearancePageCollector.OnHTML("main.page__main", func(page *colly.HTMLElement) {
-		dto = s.scrapeWorkOfArtPage(page)
+		dto = s.appearanceParser.Parse(page)
 	})
 
+	// now scrape each found appearance page
 	listItems.Each(func(index int, appearance *goquery.Selection) {
 		url, exists := appearance.Find("a:first-of-type").Attr("href")
 		if !exists {
 			return
 		}
 
-		appearancePageCollector.Visit(page.Request.AbsoluteURL(url))
+		// wait for "OnHTML" event fills the dto
+		err := appearancePageCollector.Visit(page.Request.AbsoluteURL(url))
+		if (err != nil) && !s.isErrorAlreadyVisited(err) {
+			s.logger.Log("Unable to visit appearance page:", err)
+			return
+		}
+
 		appearancePageCollector.Wait()
 
 		if dto.Name == "" {
@@ -822,13 +372,13 @@ func (s *Scraper) parseAppearances(page *colly.HTMLElement) []vehicle.Appearance
 				return
 			}
 
-			dto.IsFirst = (note == "first appearance")
+			dto.IsFirst = note == "first appearance"
 		}
 
-		// don't add same item multiple times, set "IsFirst" only
-		for i, appearance := range appearances {
-			if appearance.Name == dto.Name {
-				if !appearance.IsFirst && dto.IsFirst {
+		// don't add same item twice, set "IsFirst" only
+		for i, a := range appearances {
+			if a.Name == dto.Name {
+				if !a.IsFirst && dto.IsFirst {
 					appearances[i].IsFirst = dto.IsFirst
 				}
 

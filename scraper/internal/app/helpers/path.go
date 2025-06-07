@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-// Return application's root directory.
+// GetRootDir returns application root directory.
 func GetRootDir() (string, error) {
 	currentDir, err := os.Getwd()
 	if err != nil {

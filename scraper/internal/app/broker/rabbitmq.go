@@ -7,6 +7,7 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
+// RabbitMQClient is a client for RabbitMQ broker.
 type RabbitMQClient struct {
 	exchangeName string
 	connection   *amqp.Connection
@@ -39,6 +40,7 @@ func NewRabbitMQClient(config Config, exchangeName string) RabbitMQClient {
 	}
 }
 
+// Publish sends the message to exchange.
 func (c *RabbitMQClient) Publish(body string) {
 	message := amqp.Publishing{
 		ContentType: "application/json",
@@ -51,7 +53,15 @@ func (c *RabbitMQClient) Publish(body string) {
 	}
 }
 
+// Stop closes all channels and connections.
 func (c *RabbitMQClient) Stop() {
-	c.channel.Close()
-	c.connection.Close()
+	err := c.channel.Close()
+	if err != nil {
+		panic(err)
+	}
+
+	err = c.connection.Close()
+	if err != nil {
+		panic(err)
+	}
 }

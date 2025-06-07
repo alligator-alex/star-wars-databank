@@ -19,7 +19,7 @@ rabbitmq.prepare: ## RabbitMQ: Add publisher and consumer users
 	$(RABBITMQ_SH) "rabbitmqctl add_user ${RABBITMQ_PUBLISHER_USERNAME} ${RABBITMQ_PUBLISHER_PASSWORD}" || true
 	$(RABBITMQ_SH) "rabbitmqctl set_permissions -p / ${RABBITMQ_PUBLISHER_USERNAME} '^${RABBITMQ_EXCHANGE}$$' '^${RABBITMQ_EXCHANGE}$$' ''" || true
 	$(RABBITMQ_SH) "rabbitmqctl add_user ${RABBITMQ_CONSUMER_USERNAME} ${RABBITMQ_CONSUMER_PASSWORD}" || true
-	$(RABBITMQ_SH) "rabbitmqctl set_permissions -p / ${RABBITMQ_CONSUMER_USERNAME} '^${RABBITMQ_EXCHANGE}.*$$' '^${RABBITMQ_EXCHANGE}.*$$' '.*" || true
+	$(RABBITMQ_SH) "rabbitmqctl set_permissions -p / ${RABBITMQ_CONSUMER_USERNAME} '^${RABBITMQ_EXCHANGE}.*$$' '^${RABBITMQ_EXCHANGE}.*$$' '.*'" || true
 
 app.artisan: ## App: Run Laravel `artisan` command (example: `make app.artisan command="migrate"`)
 	$(APP_SH) "./artisan $(command)"

@@ -2,7 +2,7 @@ package core
 
 type NullableString string
 
-// Mashal empty string as null.
+// MarshalJSON encodes empty string as null.
 func (s NullableString) MarshalJSON() ([]byte, error) {
 	if s == "" {
 		return []byte("null"), nil
@@ -15,4 +15,13 @@ func (s NullableString) MarshalJSON() ([]byte, error) {
 	result = append(result, '"')
 
 	return result, nil
+}
+
+type PageTemplate string
+
+type InvalidPageTemplateError struct {
+}
+
+func (e *InvalidPageTemplateError) Error() string {
+	return "This page has an invalid template"
 }

@@ -1,4 +1,5 @@
 @php
+use App\Modules\Databank\Common\Enums\CookieName;
 use App\Modules\Databank\Common\Enums\MediaType;
 use App\Modules\Databank\Common\Models\Faction;
 use App\Modules\Databank\Common\Models\Media;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\Cookie;
  * @var Collection<Media> $media
  */
 
-$skipInto = (Cookie::get('skip_intro') === 'Y');
+$skipInto = (Cookie::get(CookieName::SKIP_INTRO->value) === 'Y');
 @endphp
 
 @extends('public.layouts.app')
@@ -38,7 +39,7 @@ $skipInto = (Cookie::get('skip_intro') === 'Y');
                 </noindex>
             </div>
             <a href="{{ route(name: VehicleRouteName::LIST, absolute: false) }}"
-               class="yellow-button wow fadeInUp" data-wow-delay="200ms">
+               class="button button--yellow wow fadeInUp" data-wow-delay="200ms">
                 <span class="rogue-icon"><noindex>1</noindex></span>
                 <span>{{ __('All :count vehicles', ['count' => $vehiclesCount]) }}</span>
             </a>
