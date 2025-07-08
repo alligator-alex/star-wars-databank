@@ -29,7 +29,7 @@ class ProfileScreen extends Screen
 
     public function name(): ?string
     {
-        return 'Hello there';
+        return __('Profile');
     }
 
     /**

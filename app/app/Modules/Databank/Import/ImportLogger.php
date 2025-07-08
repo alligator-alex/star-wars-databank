@@ -10,6 +10,6 @@ class ImportLogger extends FileLogger
 {
     public function getFileNameWithoutExtension(): string
     {
-        return 'vehicle-import';
+        return 'databank-import';
     }
 }

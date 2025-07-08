@@ -44,7 +44,7 @@ class Breadcrumbs
 
     public static function render(): View
     {
-        return static::getInstance()->viewFactory->make('public.components.breadcrumbs', [
+        return static::getInstance()->viewFactory->make('public.common.breadcrumbs', [
             'items' => array_values(static::getInstance()->items),
         ]);
     }

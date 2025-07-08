@@ -14,7 +14,7 @@ trait LayoutWithModel
     /**
      * @return TModel
      */
-    protected function getModel(): Model
+    protected function model(): Model
     {
         static $model;
 

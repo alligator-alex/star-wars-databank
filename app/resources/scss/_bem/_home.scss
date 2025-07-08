@@ -104,10 +104,13 @@
         }
     }
 
-    .explore {
-        .pagination__button {
-            transition-property: background-color, color, transform;
-        }
+    .page-title {
+        text-align: center;
+    }
+
+    .entity-explorer {
+        margin-bottom: 1.5rem;
+        margin-top: 0;
     }
 
     h2 {
@@ -139,7 +142,7 @@
             position: relative;
             text-decoration: none;
             transition: none;
-            width: 50%;
+            width: 33.333%;
 
             @media(min-width: $desktop-min) {
                 margin: 0 0 2.5rem;
@@ -168,7 +171,7 @@
         &__emblem {
             filter: grayscale(0.5);
             flex-shrink: 0;
-            height: 5rem;
+            height: 4rem;
             margin-bottom: 1rem;
             transition-duration: 0.2s;
             transition-property: filter, transform;

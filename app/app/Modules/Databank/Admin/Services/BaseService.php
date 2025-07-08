@@ -24,9 +24,9 @@ abstract class BaseService
     /**
      * @return TModel
      */
-    public function getNewModel(): Model
+    public function newModel(): Model
     {
-        return $this->repository->getNewModel();
+        return $this->repository->newModel();
     }
 
     /**
@@ -35,16 +35,16 @@ abstract class BaseService
     abstract protected function relations(): array;
 
     /**
-     * Find all models with pagination.
+     * Find models with pagination and optional filter.
      *
      * @param Selection|null $filter
      *
      * @return LengthAwarePaginator<TModel>
      */
-    public function findAllPaginated(?Selection $filter = null): LengthAwarePaginator
+    public function findPaginated(?Selection $filter = null): LengthAwarePaginator
     {
         /** @var Builder<TModel> $query */
-        $query = $this->repository->getQueryBuilder();
+        $query = $this->repository->queryBuilder();
 
         /** @phpstan-ignore-next-line */
         $query->withDrafts();
@@ -74,9 +74,9 @@ abstract class BaseService
      *
      * @throws AdminServiceException
      */
-    public function find(int $id): Model
+    public function findOneById(int $id): Model
     {
-        $model = $this->repository->findById($id, true);
+        $model = $this->repository->findOneById($id, true);
 
         if (!$model) {
             throw new AdminServiceException('Not found');
@@ -100,7 +100,7 @@ abstract class BaseService
      */
     public function togglePublish(int $id): Model
     {
-        $model = $this->find($id);
+        $model = $this->findOneById($id);
 
         if (!method_exists($model, 'isPublished')) {
             throw new AdminServiceException($model::class . ' is not an instance of Publishable');
@@ -134,7 +134,7 @@ abstract class BaseService
      */
     public function delete(int $id): Model
     {
-        $model = $this->find($id);
+        $model = $this->findOneById($id);
 
         if (!$this->repository->delete($model)) {
             throw new AdminServiceException('Unable to delete');

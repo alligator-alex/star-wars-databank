@@ -82,6 +82,7 @@
         display: flex;
         flex-wrap: wrap;
         margin: 0 -0.5rem;
+        min-height: 225px;
 
         &.flickity-enabled {
             display: block;

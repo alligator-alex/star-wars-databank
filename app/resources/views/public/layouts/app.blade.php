@@ -1,7 +1,8 @@
 @php
 use App\Modules\Core\Public\Components\Breadcrumbs;
 use App\Modules\Databank\Common\Enums\CookieName;
-use Illuminate\Support\Facades\Route;
+use App\Modules\Databank\Public\Enums\DatabankRouteName;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Cookie;
 
 $cookieConsent = (Cookie::get(CookieName::COOKIE_CONSENT->value) === 'Y');
@@ -34,7 +35,7 @@ $cookieConsent = (Cookie::get(CookieName::COOKIE_CONSENT->value) === 'Y');
 
 <div class="page-wrapper @yield('page-wrapper-class')">
     <main class="page-content">
-        @if (!isset($exception) && (Route::currentRouteName() !== 'home'))
+        @if (!isset($exception) && (Request::route()?->getName() !== DatabankRouteName::HOME->value))
             {!! Breadcrumbs::render() !!}
         @endif
         @yield('content')

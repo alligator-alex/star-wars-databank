@@ -17,6 +17,8 @@ func (s NullableString) MarshalJSON() ([]byte, error) {
 	return result, nil
 }
 
+type EntityType string
+
 type PageTemplate string
 
 type InvalidPageTemplateError struct {

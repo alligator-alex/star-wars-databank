@@ -8,8 +8,8 @@ use App\Modules\Databank\Common\Contracts\HumanReadableEnum;
 
 enum Status: int implements HumanReadableEnum
 {
-    case DRAFT = 1;
-    case PUBLISHED = 2;
+    case DRAFT = 0;
+    case PUBLISHED = 1;
 
     public function nameForHumans(): string
     {

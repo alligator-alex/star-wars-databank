@@ -9,8 +9,19 @@ import (
 
 // Parser is a common parser for Wookieepedia pages.
 // It contains basic function and should be extended to parse a specific page type.
-type Parser struct {
-	infobox *goquery.Selection
+type Parser struct{}
+
+func (p *Parser) GetMainInfo(page *colly.HTMLElement) MainInfoDTO {
+	infobox := p.FindPageInfobox(page)
+
+	return MainInfoDTO{
+		Name:        p.ParsePageTitle(page),
+		ImageURL:    p.ParseImageUrl(infobox),
+		Description: p.ParsePageText(page),
+		URL:         page.Request.URL.Scheme + "://" + page.Request.URL.Host + page.Request.URL.Path,
+		RelatedURL:  NullableString(p.ParseCanonRelatedURL(page)),
+		IsCanon:     p.IsCanonPage(page),
+	}
 }
 
 // ParsePageTitle extracts the page title from the H1 heading.
@@ -143,17 +154,10 @@ func (p *Parser) ParseImageUrl(infoboxSelection *goquery.Selection) string {
 	return ""
 }
 
-// IsPageOneOfTemplates verifies that page template is included in the allowed list.
-func (p *Parser) IsPageOneOfTemplates(page *colly.HTMLElement, allowedTemplates []PageTemplate) bool {
-	url, exists := p.FindPageInfobox(page).Find(".plainlinks > a").Attr("href")
-	if !exists {
-		return false
-	}
-
-	pageTemplate := p.ExtractPageUrlTemplateName(url)
-
-	for _, template := range allowedTemplates {
-		if string(template) == pageTemplate {
+// IsPageTemplateSupported verifies that page template is included in the supported list.
+func (p *Parser) IsPageTemplateSupported(template PageTemplate, supportedTemplates []PageTemplate) bool {
+	for _, t := range supportedTemplates {
+		if t == template {
 			return true
 		}
 	}
@@ -315,4 +319,13 @@ func (p *Parser) parseInfoboxItem(selection *goquery.Selection) AdditionalDataDT
 		Note:     NullableString(note),
 		Children: children,
 	}
+}
+
+func (p *Parser) ParseFactions(infoboxSelection *goquery.Selection) []AdditionalDataDTO {
+	factionsData := infoboxSelection.Find(`div[data-source="affiliation"]`)
+	if factionsData.Length() == 0 {
+		return []AdditionalDataDTO{}
+	}
+
+	return p.ParseInfoboxDataSource(factionsData)
 }

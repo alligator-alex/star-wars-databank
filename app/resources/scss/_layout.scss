@@ -125,10 +125,6 @@ svg {
         color: $dark-grey;
         font-size: 1rem;
         font-weight: bold;
-
-        @media(min-width: $desktop-min) {
-            font-size: 1.25rem;
-        }
     }
 }
 
@@ -145,7 +141,7 @@ h1, .h1 {
     text-transform: uppercase;
 
     @media(min-width: $desktop-min) {
-        font-size: 2.75rem;
+        font-size: 2.2rem;
     }
 }
 

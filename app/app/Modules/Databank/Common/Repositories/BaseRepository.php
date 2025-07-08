@@ -21,9 +21,9 @@ abstract class BaseRepository extends PublishableModelRepository
      *
      * @return TModel|null
      */
-    public function findByName(string $name, bool $withDrafts = false): ?Model
+    public function findOneByName(string $name, bool $withDrafts = false): ?Model
     {
-        $query = $this->getQueryBuilder();
+        $query = $this->queryBuilder();
 
         if ($withDrafts) {
             /** @phpstan-ignore-next-line */
@@ -46,9 +46,9 @@ abstract class BaseRepository extends PublishableModelRepository
      *
      * @return Model|null
      */
-    public function findBySlug(string $slug, bool $withDrafts = false): ?Model
+    public function findOneBySlug(string $slug, bool $withDrafts = false): ?Model
     {
-        $query = $this->getQueryBuilder();
+        $query = $this->queryBuilder();
 
         if ($withDrafts) {
             /** @phpstan-ignore-next-line */
@@ -61,5 +61,24 @@ abstract class BaseRepository extends PublishableModelRepository
         $model = $query->first();
 
         return $model;
+    }
+
+    /**
+     * Get models count.
+     *
+     * @param bool $withDrafts
+     *
+     * @return int
+     */
+    public function count(bool $withDrafts = false): int
+    {
+        $query = $this->queryBuilder();
+
+        if ($withDrafts) {
+            /** @phpstan-ignore-next-line */
+            $query->withDrafts();
+        }
+
+        return $query->count();
     }
 }

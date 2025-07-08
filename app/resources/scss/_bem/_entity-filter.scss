@@ -1,0 +1,276 @@
+.entity-filter {
+    margin-bottom: 1rem;
+
+    &__toggle {
+        align-items: center;
+        color: $dark-grey;
+        cursor: pointer;
+        display: inline-flex;
+        font-family: $font-family-title;
+        font-size: 1.25rem;
+        font-weight: 500;
+        justify-content: start;
+        letter-spacing: 0.1rem;
+        text-transform: uppercase;
+        transition-duration: 0.2s;
+        transition-property: color;
+        transition-timing-function: ease-in-out;
+        vertical-align: top;
+
+        &-label {
+            display: flex;
+
+            &::before {
+                content: attr(data-show-label);
+                vertical-align: text-bottom;
+            }
+
+            &::after {
+                background-color: $yellow;
+                border-radius: 50%;
+                color: $black;
+                content: attr(data-applied-filters-count);
+                display: inline-block;
+                font-size: 0.7rem;
+                font-weight: 500;
+                height: 1rem;
+                line-height: 1rem;
+                margin: 0 0 0 0.4rem;
+                overflow: hidden;
+                text-align: center;
+                transform: translateY(-0.4rem);
+                visibility: visible;
+                width: 1rem;
+            }
+
+            &[data-applied-filters-count="0"]::after {
+                display: none;
+                visibility: hidden;
+            }
+        }
+
+        &:hover {
+            color: $blue;
+
+            .burger-menu-icon {
+                width: 1.75rem;
+            }
+
+            .burger-menu-icon__item {
+                width: 100% !important;
+            }
+        }
+
+        &.is-active {
+            .entity-filter__toggle-label::before {
+                content: attr(data-hide-label);
+            }
+
+            .burger-menu-icon {
+                width: 1.75rem;
+            }
+
+            .burger-menu-icon__item {
+                width: 100% !important;
+            }
+        }
+
+        .burger-menu-icon {
+            align-items: end;
+            display: flex;
+            flex-direction: column;
+            height: 0.95rem;
+            justify-content: space-between;
+            margin-right: 0.5rem;
+            transition-duration: 0.2s;
+            transition-property: width;
+            transition-timing-function: ease-in-out;
+            width: 1.25rem;
+
+            &__item {
+                background-color: $blue;
+                height: 3px;
+                transition-duration: 0.2s;
+                transition-property: width;
+                transition-timing-function: ease-in-out;
+                width: 60%;
+
+                &:first-child {
+                    width: 100%;
+                }
+
+                &:last-child {
+                    width: 30%;
+                }
+            }
+        }
+    }
+
+    #filter-controls-toggle {
+        display: none;
+        visibility: hidden;
+    }
+
+    #filter-controls-toggle:checked ~ .entity-filter__title .entity-filter__toggle .entity-filter__toggle-label::after {
+        visibility: hidden;
+    }
+
+    &__controls {
+        display: none;
+        gap: 0.5rem;
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+
+        @media(min-width: $desktop-min) {
+            gap: 1rem;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+
+    &.is-active {
+        .entity-filter__controls {
+            display: grid;
+        }
+    }
+
+    #filter-controls-toggle:checked ~ .entity-filter__controls {
+        display: grid;
+    }
+
+    select {
+        border: 0;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        white-space: nowrap;
+        width: 0;
+    }
+
+    .ts-wrapper {
+        .ts-control {
+            input {
+                padding-left: 1.5rem;
+            }
+
+            .item + input {
+                padding-left: 0.8rem;
+            }
+        }
+
+        &.has-items {
+            .ts-control {
+                input {
+                    padding: 0;
+                }
+
+                &::before {
+                    color: $black;
+                }
+            }
+        }
+
+        &.focus {
+            .ts-control {
+                &::before {
+                    color: $yellow;
+                }
+            }
+        }
+
+        .item {
+            &:first-child {
+                margin-left: 1.5rem;
+            }
+        }
+    }
+
+    &__input {
+        .ts-control {
+            &::before {
+                color: $dark-grey-alt;
+                content: "";
+                font-family: $font-family-icons;
+                font-size: 1.25rem;
+                font-weight: 400;
+                left: 4px;
+                letter-spacing: 0;
+                line-height: 1;
+                position: absolute;
+                top: 10px;
+                transform: translateY(-0.1rem);
+                transition: color 0.2s ease-in-out;
+                user-select: none;
+                z-index: 0;
+            }
+
+            &:hover {
+                &:before {
+                    color: $yellow;
+                }
+            }
+        }
+
+        &--faction {
+            .ts-control {
+                &::before {
+                    content: 'a';
+                }
+            }
+        }
+
+        &--manufacturer {
+            .ts-control {
+                &::before {
+                    content: 'r1';
+                }
+            }
+        }
+
+        &--media {
+            .ts-control {
+                &::before {
+                    content: '5';
+                }
+            }
+        }
+
+        &--line {
+            .ts-control {
+                &::before {
+                    content: 'f4';
+                }
+            }
+        }
+
+        &--category {
+            .ts-control {
+                &::before {
+                    content: 's';
+                }
+            }
+        }
+
+        &--type {
+            .ts-control {
+                &::before {
+                    content: 'h';
+                }
+            }
+        }
+
+        &--model {
+            .ts-control {
+                &::before {
+                    content: '1';
+                }
+            }
+        }
+
+        &--class {
+            .ts-control {
+                &::before {
+                    content: 'e';
+                }
+            }
+        }
+    }
+}

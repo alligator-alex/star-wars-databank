@@ -10,9 +10,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @method static Builder<static> withDrafts()
- * @method static Builder<static> withoutDrafts()
- * @method static Builder<static> onlyDrafts()
+ * @method Builder<static> withDrafts()
+ * @method Builder<static> withoutDrafts()
+ * @method Builder<static> onlyDrafts()
  *
  * @mixin Model
  */

@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace App\Modules\Databank\Console\Commands;
 
 use App\Modules\Databank\Common\Enums\Status;
-use App\Modules\Databank\Common\Models\Line;
-use App\Modules\Databank\Common\Models\Manufacturer;
-use App\Modules\Databank\Common\Models\Vehicle;
-use App\Modules\Databank\Common\Models\VehicleManufacturer;
+use App\Modules\Manufacturer\Common\Models\Manufacturer;
+use App\Modules\Manufacturer\Common\Models\Pivots\Manufacturable;
 use Illuminate\Console\Command;
 
 class DisableUnusedRelations extends Command
@@ -17,35 +15,16 @@ class DisableUnusedRelations extends Command
 
     public function handle(): void
     {
-        $this->disableUnusedLines();
         $this->disableUnusedManufacturers();
-    }
-
-    private function disableUnusedLines(): void
-    {
-        $linesTable = Line::tableName();
-        $vehiclesTable = Vehicle::tableName();
-
-        $draftStatus = Status::DRAFT->value;
-        $publishedStatus = Status::PUBLISHED->value;
-
-        $sql = "{$linesTable}.id in("
-            . "select {$vehiclesTable}.line_id from {$vehiclesTable} where status = {$draftStatus}"
-            . " except select {$vehiclesTable}.line_id from {$vehiclesTable} where status = {$publishedStatus}"
-        . ")";
-
-        Line::query()->whereRaw($sql)->update([
-            'status' => $draftStatus,
-        ]);
     }
 
     private function disableUnusedManufacturers(): void
     {
         $manufacturerTable = Manufacturer::tableName();
-        $vehicleManufacturerTable = VehicleManufacturer::tableName();
+        $manufacturableTable = Manufacturable::tableName();
 
         $sql =  "{$manufacturerTable}.id not in("
-            . "select distinct {$vehicleManufacturerTable}.manufacturer_id from {$vehicleManufacturerTable}"
+            . "select distinct {$manufacturableTable}.manufacturer_id from {$manufacturableTable}"
         . ")";
 
         Manufacturer::query()->whereRaw($sql)->update([

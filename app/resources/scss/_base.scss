@@ -19,6 +19,7 @@
     color: $light-grey;
     display: flex;
     font-weight: 500;
+    gap: 1em;
     margin-bottom: 1rem;
 
     &:last-child {
@@ -30,16 +31,7 @@
     }
 
     &__item {
-        margin-left: 1rem;
-
-        &--category,
-        &--type {
-            white-space: nowrap;
-        }
-
-        &:first-child {
-            margin-left: 0;
-        }
+        white-space: nowrap;
     }
 
     &__link {
@@ -263,7 +255,7 @@ a.faction-emblem {
 
     &--main {
         justify-content: space-between;
-        margin-bottom: 2.5rem;
+        margin-bottom: 2rem;
     }
 
     .page-title {

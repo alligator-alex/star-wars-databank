@@ -1,12 +1,13 @@
 {
-    "name": "sw/vehicles",
+    "name": "sw/databank",
     "version": "1.0.0",
     "type": "project",
-    "description": "Star Wars Vehicles Databank Project.",
+    "description": "Star Wars Databank Project.",
     "require": {
         "php": "^8.4",
         "ext-fileinfo": "*",
         "ext-sockets": "*",
+        "ext-xmlwriter": "*",
         "cviebrock/eloquent-sluggable": "^11",
         "larastan/larastan": "^3",
         "laravel/framework": "^11",

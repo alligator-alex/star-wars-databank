@@ -2,16 +2,28 @@
 
 declare(strict_types=1);
 
-use App\Modules\Core\Admin\Controllers\PlatformScreen;
 use App\Modules\Core\Admin\Controllers\User\ProfileScreen;
 use App\Modules\Core\Admin\Enums\AdminRouteName;
 use App\Modules\Core\Admin\Enums\UserRouteName;
-use App\Modules\Databank\Admin\Controllers as DatabankControllers;
-use App\Modules\Databank\Admin\Enums\FactionRouteName;
-use App\Modules\Databank\Admin\Enums\LineRouteName;
-use App\Modules\Databank\Admin\Enums\ManufacturerRouteName;
-use App\Modules\Databank\Admin\Enums\VehicleRouteName;
-use App\Modules\Databank\Admin\Enums\MediaRouteName;
+use App\Modules\Databank\Admin\Controllers\HomePageController;
+use App\Modules\Droid\Admin\Controllers\DroidDetailController;
+use App\Modules\Droid\Admin\Controllers\DroidIndexController;
+use App\Modules\Droid\Admin\Enums\DroidRouteName;
+use App\Modules\Faction\Admin\Controllers\FactionDetailController;
+use App\Modules\Faction\Admin\Controllers\FactionIndexController;
+use App\Modules\Faction\Admin\Enums\FactionRouteName;
+use App\Modules\Handbook\Admin\Controllers\HandbookValueDetailController;
+use App\Modules\Handbook\Admin\Controllers\HandbookValueIndexController;
+use App\Modules\Handbook\Admin\Enums\HandbookValueRouteName;
+use App\Modules\Manufacturer\Admin\Controllers\ManufacturerDetailController;
+use App\Modules\Manufacturer\Admin\Controllers\ManufacturerIndexController;
+use App\Modules\Manufacturer\Admin\Enums\ManufacturerRouteName;
+use App\Modules\Media\Admin\Controllers\MediaDetailController;
+use App\Modules\Media\Admin\Controllers\MediaIndexController;
+use App\Modules\Media\Admin\Enums\MediaRouteName;
+use App\Modules\Vehicle\Admin\Controllers\VehicleDetailController;
+use App\Modules\Vehicle\Admin\Controllers\VehicleIndexController;
+use App\Modules\Vehicle\Admin\Enums\VehicleRouteName;
 use Illuminate\Support\Facades\Route;
 use Tabuna\Breadcrumbs\Trail;
 
@@ -27,18 +39,21 @@ use Tabuna\Breadcrumbs\Trail;
 */
 
 // Main
-Route::screen('/databank', PlatformScreen::class)
+Route::screen('/dashboard', HomePageController::class)
     ->name(AdminRouteName::HOME)
-    ->breadcrumbs(fn (Trail $trail) => $trail
-        ->push(__('Dashboard'), route(name: AdminRouteName::HOME, absolute: false)));
+    ->breadcrumbs(
+        fn (Trail $trail) => $trail
+        ->push(__('Dashboard'), route(name: AdminRouteName::HOME, absolute: false))
+    );
 
 // Profile
 Route::prefix('/profile')->group(static function () {
     Route::get('/', ProfileScreen::class)
         ->name(UserRouteName::PROFILE)
-        ->breadcrumbs(static fn (Trail $trail) => $trail
-            ->parent(AdminRouteName::HOME->value)
-            ->push(__('Profile'), route(name: UserRouteName::PROFILE, absolute: false)));
+        ->breadcrumbs(
+            static fn (Trail $trail) => $trail
+            ->push(__('Profile'), route(name: UserRouteName::PROFILE, absolute: false))
+        );
 
     Route::post('/', [ProfileScreen::class, 'update'])
         ->name(UserRouteName::UPDATE);
@@ -47,173 +62,124 @@ Route::prefix('/profile')->group(static function () {
         ->name(UserRouteName::CHANGE_PASSWORD);
 });
 
-// Factions
-Route::prefix('/factions')->group(static function () {
-    Route::get('/', DatabankControllers\Faction\ListScreen::class)
-        ->name(FactionRouteName::LIST)
-        ->breadcrumbs(static fn (Trail $trail): Trail => $trail
-            ->parent(AdminRouteName::HOME->value)
-            ->push(__('Factions'), FactionRouteName::LIST->value));
+// Handbooks
+Route::prefix('/handbook')->group(static function () {
+    Route::get('/{handbookId}/values', HandbookValueIndexController::class)
+        ->name(HandbookValueRouteName::INDEX);
+    Route::get('/{handbookId}/values/{handbookValueId}/edit', HandbookValueDetailController::class)
+        ->name(HandbookValueRouteName::EDIT);
+    Route::get('/{handbookId}/values/create', HandbookValueDetailController::class)
+        ->name(HandbookValueRouteName::CREATE);
 
-    Route::post('/create', [DatabankControllers\Faction\EditScreen::class, 'create'])
+    Route::post('/{handbookId}/values', [HandbookValueDetailController::class, 'store'])
+        ->name(HandbookValueRouteName::STORE);
+    Route::post('/{handbookId}/values/{handbookValueId}', [HandbookValueDetailController::class, 'update'])
+        ->name(HandbookValueRouteName::UPDATE);
+    Route::post('/{handbookId}/values/{handbookValueId}/delete', [HandbookValueDetailController::class, 'delete'])
+        ->name(HandbookValueRouteName::DELETE);
+});
+
+// Factions
+Route::prefix('/factions')->group(static function (): void {
+    Route::get('/', FactionIndexController::class)
+        ->name(FactionRouteName::INDEX);
+    Route::get('/{id}/edit', FactionDetailController::class)
+        ->name(FactionRouteName::EDIT);
+    Route::get('/create', FactionDetailController::class)
         ->name(FactionRouteName::CREATE);
 
-    Route::get('/create', DatabankControllers\Faction\EditScreen::class)
-        ->name(FactionRouteName::NEW)
-        ->breadcrumbs(static fn (Trail $trail): Trail => $trail
-            ->parent(FactionRouteName::LIST->value)
-            ->push(__('Create')));
-
-    Route::post('/{id}', [DatabankControllers\Faction\EditScreen::class, 'update'])
+    Route::post('/', [FactionDetailController::class, 'store'])
+        ->name(FactionRouteName::STORE);
+    Route::post('/{id}', [FactionDetailController::class, 'update'])
         ->name(FactionRouteName::UPDATE);
-
-    Route::get('/{id}', DatabankControllers\Faction\EditScreen::class)
-        ->name(FactionRouteName::ONE)
-        ->breadcrumbs(static fn (Trail $trail): Trail => $trail
-            ->parent(FactionRouteName::LIST->value)
-            ->push(__('Edit')));
-
-    Route::post('/{id}/delete', [DatabankControllers\Faction\EditScreen::class, 'delete'])
+    Route::post('/{id}/delete', [FactionDetailController::class, 'delete'])
         ->name(FactionRouteName::DELETE);
-
-    Route::post('/{id}/toggle-publish', [DatabankControllers\Faction\EditScreen::class, 'togglePublish'])
+    Route::post('/{id}/toggle-publish', [FactionDetailController::class, 'togglePublish'])
         ->name(FactionRouteName::TOGGLE_PUBLISH);
 });
 
-// Lines
-Route::prefix('/lines')->group(static function () {
-    Route::get('/', DatabankControllers\Line\ListScreen::class)
-        ->name(LineRouteName::LIST)
-        ->breadcrumbs(static fn (Trail $trail): Trail => $trail
-            ->parent(AdminRouteName::HOME->value)
-            ->push(__('Lines'), LineRouteName::LIST->value));
-
-    Route::post('/create', [DatabankControllers\Line\EditScreen::class, 'create'])
-        ->name(LineRouteName::CREATE);
-
-    Route::get('/create', DatabankControllers\Line\EditScreen::class)
-        ->name(LineRouteName::NEW)
-        ->breadcrumbs(static fn (Trail $trail): Trail => $trail
-            ->parent(LineRouteName::LIST->value)
-            ->push(__('Create')));
-
-    Route::post('/{id}', [DatabankControllers\Line\EditScreen::class, 'update'])
-        ->name(LineRouteName::UPDATE);
-
-    Route::get('/{id}', DatabankControllers\Line\EditScreen::class)
-        ->name(LineRouteName::ONE)
-        ->breadcrumbs(static fn (Trail $trail): Trail => $trail
-            ->parent(LineRouteName::LIST->value)
-            ->push(__('Edit')));
-
-    Route::post('/{id}/delete', [DatabankControllers\Line\EditScreen::class, 'delete'])
-        ->name(LineRouteName::DELETE);
-
-    Route::post('/{id}/toggle-publish', [DatabankControllers\Line\EditScreen::class, 'togglePublish'])
-        ->name(LineRouteName::TOGGLE_PUBLISH);
-});
-
 // Manufacturers
-Route::prefix('/manufacturers')->group(static function () {
-    Route::get('/', DatabankControllers\Manufacturer\ListScreen::class)
-        ->name(ManufacturerRouteName::LIST)
-        ->breadcrumbs(static fn (Trail $trail): Trail => $trail
-            ->parent(AdminRouteName::HOME->value)
-            ->push(__('Manufacturers'), ManufacturerRouteName::LIST->value));
-
-    Route::post('/create', [DatabankControllers\Manufacturer\EditScreen::class, 'create'])
+Route::prefix('/manufacturers')->group(static function (): void {
+    Route::get('/', ManufacturerIndexController::class)
+        ->name(ManufacturerRouteName::INDEX);
+    Route::get('/{id}/edit', ManufacturerDetailController::class)
+        ->name(ManufacturerRouteName::EDIT);
+    Route::get('/create', ManufacturerDetailController::class)
         ->name(ManufacturerRouteName::CREATE);
 
-    Route::get('/create', DatabankControllers\Manufacturer\EditScreen::class)
-        ->name(ManufacturerRouteName::NEW)
-        ->breadcrumbs(static fn (Trail $trail): Trail => $trail
-            ->parent(ManufacturerRouteName::LIST->value)
-            ->push(__('Create')));
-
-    Route::post('/{id}', [DatabankControllers\Manufacturer\EditScreen::class, 'update'])
+    Route::post('/', [ManufacturerDetailController::class, 'store'])
+        ->name(ManufacturerRouteName::STORE);
+    Route::post('/{id}', [ManufacturerDetailController::class, 'update'])
         ->name(ManufacturerRouteName::UPDATE);
-
-    Route::get('/{id}', DatabankControllers\Manufacturer\EditScreen::class)
-        ->name(ManufacturerRouteName::ONE)
-        ->breadcrumbs(static fn (Trail $trail): Trail => $trail
-            ->parent(ManufacturerRouteName::LIST->value)
-            ->push(__('Edit')));
-
-    Route::post('/{id}/delete', [DatabankControllers\Manufacturer\EditScreen::class, 'delete'])
+    Route::post('/{id}/delete', [ManufacturerDetailController::class, 'delete'])
         ->name(ManufacturerRouteName::DELETE);
-
-    Route::post('/{id}/toggle-publish', [DatabankControllers\Manufacturer\EditScreen::class, 'togglePublish'])
+    Route::post('/{id}/toggle-publish', [ManufacturerDetailController::class, 'togglePublish'])
         ->name(ManufacturerRouteName::TOGGLE_PUBLISH);
-});
-
-// Vehicles
-Route::prefix('/vehicles')->group(static function () {
-    Route::get('/', DatabankControllers\Vehicle\ListScreen::class)
-        ->name(VehicleRouteName::LIST)
-        ->breadcrumbs(static fn (Trail $trail): Trail => $trail
-            ->parent(AdminRouteName::HOME->value)
-            ->push(__('Vehicles'), VehicleRouteName::LIST->value));
-
-    Route::post('/create', [DatabankControllers\Vehicle\EditScreen::class, 'create'])
-        ->name(VehicleRouteName::CREATE);
-
-    Route::get('/create', DatabankControllers\Vehicle\EditScreen::class)
-        ->name(VehicleRouteName::NEW)
-        ->breadcrumbs(static fn (Trail $trail): Trail => $trail
-            ->parent(VehicleRouteName::LIST->value)
-            ->push(__('Create')));
-
-    Route::post('/{id}', [DatabankControllers\Vehicle\EditScreen::class, 'update'])
-        ->name(VehicleRouteName::UPDATE);
-
-    Route::get('/{id}', DatabankControllers\Vehicle\EditScreen::class)
-        ->name(VehicleRouteName::ONE)
-        ->breadcrumbs(static fn (Trail $trail): Trail => $trail
-            ->parent(VehicleRouteName::LIST->value)
-            ->push(__('Edit')));
-
-    Route::post('/{id}/delete', [DatabankControllers\Vehicle\EditScreen::class, 'delete'])
-        ->name(VehicleRouteName::DELETE);
-
-    Route::post('/{id}/toggle-publish', [DatabankControllers\Vehicle\EditScreen::class, 'togglePublish'])
-        ->name(VehicleRouteName::TOGGLE_PUBLISH);
-
-    Route::post('/{id}/page-settings/list', [DatabankControllers\Vehicle\EditScreen::class, 'updateListPageSettings'])
-        ->name(VehicleRouteName::UPDATE_LIST_PAGE_SETTINGS);
-
-    Route::post('/{id}/page-settings/one', [DatabankControllers\Vehicle\EditScreen::class, 'updateOnePageSettings'])
-        ->name(VehicleRouteName::UPDATE_ONE_PAGE_SETTINGS);
 });
 
 // Media
 Route::prefix('/media')->group(static function () {
-    Route::get('/', DatabankControllers\Media\ListScreen::class)
-        ->name(MediaRouteName::LIST)
-        ->breadcrumbs(static fn (Trail $trail): Trail => $trail
-            ->parent(AdminRouteName::HOME->value)
-            ->push(__('Media'), MediaRouteName::LIST->value));
-
-    Route::post('/create', [DatabankControllers\Media\EditScreen::class, 'create'])
+    Route::get('/', MediaIndexController::class)
+        ->name(MediaRouteName::INDEX);
+    Route::get('/{id}/edit', MediaDetailController::class)
+        ->name(MediaRouteName::EDIT);
+    Route::get('/create', MediaDetailController::class)
         ->name(MediaRouteName::CREATE);
 
-    Route::get('/create', DatabankControllers\Media\EditScreen::class)
-        ->name(MediaRouteName::NEW)
-        ->breadcrumbs(static fn (Trail $trail): Trail => $trail
-            ->parent(MediaRouteName::LIST->value)
-            ->push(__('Create')));
-
-    Route::post('/{id}', [DatabankControllers\Media\EditScreen::class, 'update'])
+    Route::post('/', [MediaDetailController::class, 'store'])
+        ->name(MediaRouteName::STORE);
+    Route::post('/{id}', [MediaDetailController::class, 'update'])
         ->name(MediaRouteName::UPDATE);
-
-    Route::get('/{id}', DatabankControllers\Media\EditScreen::class)
-        ->name(MediaRouteName::ONE)
-        ->breadcrumbs(static fn (Trail $trail): Trail => $trail
-            ->parent(MediaRouteName::LIST->value)
-            ->push(__('Edit')));
-
-    Route::post('/{id}/delete', [DatabankControllers\Media\EditScreen::class, 'delete'])
+    Route::post('/{id}/delete', [MediaDetailController::class, 'delete'])
         ->name(MediaRouteName::DELETE);
-
-    Route::post('/{id}/toggle-publish', [DatabankControllers\Media\EditScreen::class, 'togglePublish'])
+    Route::post('/{id}/toggle-publish', [MediaDetailController::class, 'togglePublish'])
         ->name(MediaRouteName::TOGGLE_PUBLISH);
+});
+
+// Vehicles
+Route::prefix('/vehicles')->group(static function () {
+    Route::get('/', VehicleIndexController::class)
+        ->name(VehicleRouteName::INDEX);
+    Route::get('/{id}/edit', VehicleDetailController::class)
+        ->name(VehicleRouteName::EDIT);
+    Route::get('/create', VehicleDetailController::class)
+        ->name(VehicleRouteName::CREATE);
+
+    Route::post('/', [VehicleDetailController::class, 'store'])
+        ->name(VehicleRouteName::STORE);
+    Route::post('/{id}', [VehicleDetailController::class, 'update'])
+        ->name(VehicleRouteName::UPDATE);
+    Route::post('/{id}/delete', [VehicleDetailController::class, 'delete'])
+        ->name(VehicleRouteName::DELETE);
+    Route::post('/{id}/toggle-publish', [VehicleDetailController::class, 'togglePublish'])
+        ->name(VehicleRouteName::TOGGLE_PUBLISH);
+
+    Route::post('/{id}/page-settings/index', [VehicleDetailController::class, 'updateIndexPageSettings'])
+        ->name(VehicleRouteName::UPDATE_INDEX_PAGE_SETTINGS);
+    Route::post('/{id}/page-settings/detail', [VehicleDetailController::class, 'updateDetailPageSettings'])
+        ->name(VehicleRouteName::UPDATE_DETAIL_PAGE_SETTINGS);
+});
+
+// Droids
+Route::prefix('/droids')->group(static function () {
+    Route::get('/', DroidIndexController::class)
+        ->name(DroidRouteName::INDEX);
+    Route::get('/{id}/edit', DroidDetailController::class)
+        ->name(DroidRouteName::EDIT);
+    Route::get('/create', DroidDetailController::class)
+        ->name(DroidRouteName::CREATE);
+
+    Route::post('/', [DroidDetailController::class, 'store'])
+        ->name(DroidRouteName::STORE);
+    Route::post('/{id}', [DroidDetailController::class, 'update'])
+        ->name(DroidRouteName::UPDATE);
+    Route::post('/{id}/delete', [DroidDetailController::class, 'delete'])
+        ->name(DroidRouteName::DELETE);
+    Route::post('/{id}/toggle-publish', [DroidDetailController::class, 'togglePublish'])
+        ->name(DroidRouteName::TOGGLE_PUBLISH);
+
+    Route::post('/{id}/page-settings/index', [DroidDetailController::class, 'updateIndexPageSettings'])
+        ->name(DroidRouteName::UPDATE_INDEX_PAGE_SETTINGS);
+    Route::post('/{id}/page-settings/detail', [DroidDetailController::class, 'updateDetailPageSettings'])
+        ->name(DroidRouteName::UPDATE_DETAIL_PAGE_SETTINGS);
 });

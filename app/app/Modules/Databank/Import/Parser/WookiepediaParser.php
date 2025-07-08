@@ -6,8 +6,15 @@ namespace App\Modules\Databank\Import\Parser;
 
 use App\Modules\Databank\Import\Contracts\Parser;
 use App\Modules\Databank\Import\DTOs\Appearance;
+use App\Modules\Databank\Import\DTOs\Droid;
 use App\Modules\Databank\Import\DTOs\Vehicle;
+use App\Modules\Databank\Import\Enums\EntityType;
 use App\Modules\Databank\Import\Exceptions\ParserException;
+use App\Modules\Faction\Common\Helpers\FactionHelper;
+use App\Modules\Manufacturer\Common\Helpers\ManufacturerHelper;
+use App\Modules\Media\Common\Helpers\MediaHelper;
+use App\Modules\Vehicle\Common\Helpers\VehicleLineHelper;
+use App\Modules\Vehicle\Common\Helpers\VehicleTypeHelper;
 use Illuminate\Support\Str;
 use JsonException;
 use Psr\Log\LoggerInterface;
@@ -20,27 +27,45 @@ class WookiepediaParser implements Parser
 
     /**
      * @param iterable<string> $items
+     * @param EntityType|null $type
      *
      * @return iterable<Vehicle>
      *
      * @throws ParserException
      * @throws JsonException
      */
-    public function parse(iterable $items): iterable
+    public function parse(iterable $items, ?EntityType $type = null): iterable
     {
-        $this->logger->info('Starting parsing...');
+        if ($type) {
+            $this->logger->info('Starting parsing ' . Str::title(Str::plural($type->value)) . '...');
+        } else {
+            $this->logger->info('Starting parsing...');
+        }
 
         foreach ($items as $item) {
             $data = json_decode($item, true, 16, JSON_THROW_ON_ERROR);
-            if (is_null($data)) {
+            if ($data === null) {
                 throw new ParserException('Unable to decode message JSON: ' . Str::limit($item, 5000));
             }
 
-            // TODO: droids?
-            // TODO: weapons?
-            $dto = $this->getVehicleDto($data);
+            $entityTypeName = mb_strtolower((string) $data['entityType']);
 
-            $this->logger->info('Parsing "' . $dto->getName() . '" (' . $dto->getExternalUrl() . ')');
+            $this->logger->info('Received ' . $entityTypeName . ' "' . $data['mainInfo']['name'] . '" (' . $data['mainInfo']['url'] . ')');
+
+            $entityType = EntityType::tryFrom($entityTypeName);
+            if (!$entityType) {
+                throw new ParserException('Unknown entity type "' . $entityTypeName . '"');
+            }
+
+            if ($type && ($type !== $entityType)) {
+                $this->logger->notice('Skipped: only "' . $type->value . '" expected');
+                continue;
+            }
+
+            $dto = match ($entityType) {
+                EntityType::VEHICLE => $this->getVehicleDto($data),
+                EntityType::DROID => $this->getDroidDto($data),
+            };
 
             if (empty($dto->getAppearances())) {
                 $this->logger->notice('Skipped: no major appearance');
@@ -60,65 +85,31 @@ class WookiepediaParser implements Parser
      */
     private function getVehicleDto(array $data): Vehicle
     {
-        $dto = new Vehicle((string) $data['name'], (string) $data['url']);
+        $dto = new Vehicle((string) $data['mainInfo']['name'], (string) $data['mainInfo']['url']);
 
-        $dto->setCanon(isset($data['isCanon']) && $data['isCanon']);
-        $dto->setRelatedUrl(isset($data['relatedUrl']) ? (string) $data['relatedUrl'] : null);
+        $dto->setImageUrl(isset($data['mainInfo']['imageUrl']) ? (string) $data['mainInfo']['imageUrl'] : null);
+        $dto->setDescription(isset($data['mainInfo']['description']) ? (string) $data['mainInfo']['description'] : null);
+        $dto->setRelatedUrl(isset($data['mainInfo']['relatedUrl']) ? (string) $data['mainInfo']['relatedUrl'] : null);
+        $dto->setCanon(isset($data['mainInfo']['isCanon']) && $data['mainInfo']['isCanon']);
+
         $dto->setCategoryName(isset($data['category']) ? (string) $data['category'] : null);
-        $dto->setTypeName(isset($data['type']) ? (string) $data['type'] : null);
-        $dto->setLineName(isset($data['line']) ? $this->combineSimilarLines((string) $data['line']) : null);
-        $dto->setImageUrl(isset($data['imageUrl']) ? (string) $data['imageUrl'] : null);
-        $dto->setDescription(isset($data['description']) ? (string) $data['description'] : null);
+        $dto->setTypeName(isset($data['type']) ? VehicleTypeHelper::combineSimilar((string) $data['type']) : null);
+        $dto->setLineName(isset($data['line']) ? VehicleLineHelper::combineSimilar((string) $data['line']) : null);
 
-        foreach ((array) ($data['manufacturers'] ?? []) as $manufacturerData) {
-            if (!$manufacturerData['name']) {
-                continue;
-            }
-
-            $dto->addManufacturerName($this->combineSimilarManufacturers((string) $manufacturerData['name']));
+        $factions = $this->getMajorFactionsNames((array) ($data['factions'] ?? []));
+        if (!empty($factions)) {
+            $dto->setFactionsNames($factions);
+            $dto->setMainFactionName($factions[0]);
         }
 
-        foreach ((array) ($data['factions'] ?? []) as $key => $factionData) {
-            if (!$factionData['name']) {
-                continue;
-            }
-
-            $note = mb_strtolower((string) $factionData['note']);
-            if (($note === 'stolen') || ($note === 'appropriated')) {
-                continue;
-            }
-
-            if (!$this->isMajorFaction((string) $factionData['name'])) {
-                continue;
-            }
-
-            $dto->addFactionName((string) $factionData['name']);
-
-            if ($key === 0) {
-                $dto->setMainFactionName((string) $factionData['name']);
-            }
+        $appearances = $this->getMajorAppearancesDTOs((array) ($data['appearances'] ?? []));
+        if (!empty($appearances)) {
+            $dto->setAppearances($appearances);
         }
 
-        if (!$dto->getMainFactionName() && !empty($dto->getFactionsNames())) {
-            $dto->setMainFactionName($dto->getFactionsNames()[0]);
-        }
-
-        foreach ((array) ($data['appearances'] ?? []) as $appearanceData) {
-            if (!$appearanceData['name']) {
-                continue;
-            }
-
-            if (!$this->isMajorAppearance((string) $appearanceData['name'])) {
-                continue;
-            }
-
-            $appearanceDto = new Appearance((string) $appearanceData['name']);
-
-            $appearanceDto->setImageUrl((string) $appearanceData['imageUrl']);
-            $appearanceDto->setTypeName((string) $appearanceData['type']);
-            $appearanceDto->setReleaseDate((string) $appearanceData['releaseDate']);
-
-            $dto->addAppearance($appearanceDto);
+        $manufacturers = $this->getManufacturersNames((array) ($data['manufacturers'] ?? []));
+        if (!empty($manufacturers)) {
+            $dto->setManufacturersNames($manufacturers);
         }
 
         $dto->setTechSpecs((array) ($data['technicalSpecifications'] ?? []));
@@ -127,128 +118,117 @@ class WookiepediaParser implements Parser
     }
 
     /**
-     * Combine same lines with different names.
+     * @param array<string, mixed> $data
      *
-     * @param string $name
-     *
-     * @return string
+     * @return Droid
      */
-    private function combineSimilarLines(string $name): string
+    private function getDroidDto(array $data): Droid
     {
-        return match (mb_strtolower($name)) {
-            'acclamator-class assault ship' => 'Acclamator-class',
-            'all terrain', 'all terrain armored transport' => 'All-terrain vehicle',
-            'btl y-wing starfighter', 'btl y-wing', 'y-wing starfighter' => 'Y-wing',
-            'delta fighter' => 'Delta-series',
-            'j-type star skiff' => 'J-type',
-            'laat' => 'Low Altitude Assault Transport',
-            'lucrehulk-class' => 'Lucrehulk',
-            'mc80 star cruisers' => 'MC star cruiser',
-            'tie series', 'tie fighter' => 'TIE series',
-            'x-wing starfighter' => 'X-wing',
-            default => $name,
-        };
+        $dto = new Droid((string) $data['mainInfo']['name'], (string) $data['mainInfo']['url']);
+
+        $dto->setImageUrl(isset($data['mainInfo']['imageUrl']) ? (string) $data['mainInfo']['imageUrl'] : null);
+        $dto->setDescription(isset($data['mainInfo']['description']) ? (string) $data['mainInfo']['description'] : null);
+        $dto->setRelatedUrl(isset($data['mainInfo']['relatedUrl']) ? (string) $data['mainInfo']['relatedUrl'] : null);
+        $dto->setCanon(isset($data['mainInfo']['isCanon']) && $data['mainInfo']['isCanon']);
+
+        $dto->setLineName(isset($data['line']) ? (string) $data['line'] : null);
+        $dto->setModelName(isset($data['model']) ? (string) $data['model'] : null);
+        $dto->setClassName(isset($data['class']) ? (string) $data['class'] : null);
+
+        $factions = $this->getMajorFactionsNames((array) ($data['factions'] ?? []));
+        if (!empty($factions)) {
+            $dto->setFactionsNames($factions);
+            $dto->setMainFactionName($factions[0]);
+        }
+
+        $appearances = $this->getMajorAppearancesDTOs((array) ($data['appearances'] ?? []));
+        if (!empty($appearances)) {
+            $dto->setAppearances($appearances);
+        }
+
+        $manufacturers = $this->getManufacturersNames((array) ($data['manufacturers'] ?? []));
+        if (!empty($manufacturers)) {
+            $dto->setManufacturersNames($manufacturers);
+        }
+
+        $dto->setTechSpecs((array) ($data['technicalSpecifications'] ?? []));
+
+        return $dto;
     }
 
     /**
-     * Combine same manufacturers with different names.
+     * @param array<int, array<string, mixed>> $data
      *
-     * @param string $name
-     *
-     * @return string
+     * @return string[]
      */
-    private function combineSimilarManufacturers(string $name): string
+    private function getManufacturersNames(array $data): array
     {
-        return match (mb_strtolower($name)) {
-            'cygnus spaceworks' => 'Cygnus Space Workshops',
-            'haor chall egineering' => 'Haor Chall Engineering Corporation',
-            'hoersch-kessel drive, inc.' => 'Hoersch-Kessel Drive Inc.',
-            default => $name,
-        };
+        $result = [];
+        foreach ($data as $manufacturer) {
+            if (!$manufacturer['name']) {
+                continue;
+            }
+
+            $result[] = ManufacturerHelper::combineSimilar((string) $manufacturer['name']);
+        }
+
+        return $result;
     }
 
     /**
-     * There are many factions in the Galaxy...but only a few of them really matter.
+     * @param array<int, array<string, mixed>> $data
      *
-     * @param string $name
-     *
-     * @return bool
+     * @return string[]
      */
-    private function isMajorFaction(string $name): bool
+    private function getMajorFactionsNames(array $data): array
     {
-        $map = [
-            'Alliance to Restore the Republic',
-            'Confederacy of Independent Systems',
-            'First Order',
-            'Galactic Empire',
-            'Galactic Republic',
-            'Jedi Order',
-            'New Republic',
-            'Resistance',
-            'Sith',
-        ];
+        $result = [];
+        foreach ($data as $faction) {
+            if (!$faction['name']) {
+                continue;
+            }
 
-        $name = mb_strtolower($name);
+            $note = mb_strtolower((string) $faction['note']);
+            if (($note === 'stolen') || ($note === 'appropriated')) {
+                continue;
+            }
 
-        return array_any($map, static fn (string $faction) => mb_strtolower($faction) === $name);
+            if (!FactionHelper::isMajor((string) $faction['name'])) {
+                continue;
+            }
+
+            $result[] = (string) $faction['name'];
+        }
+
+        return $result;
     }
 
     /**
-     * Follow the main films timeline (32 BBY - 35 ABY)
-     * And we really don't want to import vehicles from every series, books or novels (or Acolyte).
+     * @param array<int, array<string, mixed>> $data
      *
-     * @param string $name
-     *
-     * @return bool
+     * @return Appearance[]
      */
-    private function isMajorAppearance(string $name): bool
+    private function getMajorAppearancesDTOs(array $data): array
     {
-        $map = [
-            // Prequel trilogy
-            'Star Wars: Episode I The Phantom Menace',
-            'Star Wars: Episode II Attack of the Clones',
-            'Star Wars: Episode III Revenge of the Sith',
+        $result = [];
+        foreach ($data as $appearance) {
+            if (!$appearance['name']) {
+                continue;
+            }
 
-            // Original trilogy
-            'Star Wars: Episode IV A New Hope',
-            'Star Wars: Episode V The Empire Strikes Back',
-            'Star Wars: Episode VI Return of the Jedi',
+            if (!MediaHelper::isMajor((string) $appearance['name'])) {
+                continue;
+            }
 
-            // Sequel trilogy
-            'Star Wars: Episode VII The Force Awakens',
-            'Star Wars: Episode VIII The Last Jedi',
-            'Star Wars: Episode IX The Rise of Skywalker',
+            $dto = new Appearance((string) $appearance['name']);
 
-            // Spin-off films
-            'Rogue One: A Star Wars Story',
-            'Solo: A Star Wars Story',
+            $dto->setImageUrl((string) $appearance['imageUrl']);
+            $dto->setTypeName((string) $appearance['type']);
+            $dto->setReleaseDate((string) $appearance['releaseDate']);
 
-            // Series
-            'Ahsoka',
-            'Andor',
-            'Obi-Wan Kenobi',
-            'The Book of Boba Fett',
-            'The Mandalorian',
+            $result[] = $dto;
+        }
 
-            // Games
-            'Star Wars: Jedi Knight II: Jedi Outcast',
-            'Star Wars: Jedi Knight: Jedi Academy',
-            'Star Wars: Empire at War',
-            'Star Wars: Republic Commando',
-            'Star Wars: The Force Unleashed',
-            'Star Wars: The Force Unleashed II',
-            'Star Wars: Battlefront', // Pandemic Studios classic
-            'Star Wars: Battlefront II',
-            'Star Wars Battlefront', // DICE remake
-            'Star Wars Battlefront II',
-            'Star Wars: Squadrons',
-            'Star Wars Jedi: Fallen Order',
-            'Star Wars Jedi: Survivor',
-            'Star Wars Outlaws',
-        ];
-
-        $name = mb_strtolower($name);
-
-        return array_any($map, static fn (string $mediaName) => mb_strtolower($mediaName) === $name);
+        return $result;
     }
 }

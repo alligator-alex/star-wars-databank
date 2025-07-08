@@ -4,11 +4,14 @@
     "length": "Length",
     "width": "Width",
     "height": "Height",
+    "mass": "Mass",
     "maxSpeed": "Maximum speed",
     "maxAcceleration": "Maximum acceleration",
     "diameter": "Diameter",
     "mglt": "Megalight per hour (MGLT)",
     "hyperdriveRating": "Hyperdrive rating",
+
+    "gender": "Gender",
 
     "Cookie consent": "<p>We use cookies to&nbsp;store your preferences and&nbsp;collect anonymous analytics.</p><p>By continuing, you consent to&nbsp;this use.</p>"
 }

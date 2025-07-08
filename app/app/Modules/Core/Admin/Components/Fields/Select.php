@@ -11,7 +11,7 @@ use Orchid\Screen\Fields\Select as OrchidSelect;
  */
 class Select extends OrchidSelect
 {
-    protected $view = 'admin.fields.extended-select';
+    protected $view = 'admin.common.fields.extended-select';
 
     public function render()
     {

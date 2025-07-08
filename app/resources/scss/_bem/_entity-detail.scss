@@ -1,0 +1,206 @@
+.entity-detail {
+    @media(max-width: $desktop-min) {
+        .breadcrumbs__item:last-child {
+            display: none;
+        }
+    }
+
+    &__title {
+        position: relative;
+        z-index: 2;
+
+        h1 {
+            display: inline;
+        }
+    }
+
+    &__faction {
+        display: inline-block;
+        margin-right: 0.25rem;
+        vertical-align: -0.45rem;
+
+        @media(min-width: $desktop-min) {
+            vertical-align: -0.5rem;
+        }
+
+        .faction-emblem {
+            height: 2rem;
+            transition-duration: .2s;
+            transition-property: filter, transform;
+            transition-timing-function: ease-in-out;
+            width: 2rem;
+
+            @media(min-width: $desktop-min) {
+                height: 3rem;
+                width: 3rem;
+            }
+        }
+
+        &:hover {
+            .faction-emblem {
+                transform: scale(1.1);
+            }
+        }
+
+        &--other {
+            color: $yellow;
+            display: flex;
+            gap: 0.5rem;
+            margin: 0;
+            text-decoration: none;
+
+            .faction-emblem {
+                height: 1.25rem;
+                width: 1.25rem;
+
+                @media(min-width: $desktop-min) {
+                    height: 1.5rem;
+                    width: 1.5rem;
+                }
+            }
+        }
+    }
+
+    &__info {
+        backdrop-filter: blur(20px);
+        background: $white-80pct-transparent;
+        border-radius: 2.5rem;
+        box-shadow: 0 50px 100px 0 $black-90pct-transparent;
+        color: $black;
+        padding: 1rem;
+        position: relative;
+        width: 100%;
+        z-index: 100;
+
+        @media(min-width: $desktop-min) {
+            max-width: 50%;
+            padding: 2.5rem;
+        }
+
+        h2 {
+            margin-bottom: 1rem;
+        }
+    }
+
+    &__meta {
+        margin-top: 1rem;
+
+        .rogue-links {
+            color: $dark-grey;
+            flex-direction: column;
+            font-size: 0.8rem;
+            gap: 0.4rem;
+
+            &__icon {
+                font-size: 1.5em;
+            }
+
+            &__item {
+                margin: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            &__link {
+                color: $blue;
+                text-decoration: underline;
+                transition-duration: 0.2s;
+                transition-property: color, text-decoration-color;
+                transition-timing-function: ease-in-out;
+
+                &:hover {
+                    color: $black;
+                    text-decoration-color: transparent;
+                }
+            }
+        }
+    }
+
+    &__description {
+        p {
+            line-height: 1.5;
+        }
+
+        a {
+            color: $yellow;
+        }
+    }
+
+    &__data {
+        margin-top: 2rem;
+
+        &--other-factions {
+            align-items: center;
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            margin-top: 0;
+
+            .factions {
+                align-items: center;
+                display: flex;
+                gap: 0.5rem;
+            }
+        }
+    }
+
+    &__list {
+        li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+
+            &::before {
+                background-color: $blue;
+                content: '';
+                display: block;
+                height: 2px;
+                left: 0;
+                margin-top: -1px;
+                position: absolute;
+                top: 50%;
+                width: 1rem;
+            }
+        }
+    }
+
+    &__misc {
+        margin-top: 2rem;
+        text-align: right;
+
+        .pretty-link {
+            user-select: none;
+        }
+    }
+
+    .appearances {
+        &__name {
+            font-size: 0.8rem;
+        }
+    }
+
+    &__image {
+        align-items: start;
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1rem;
+        user-select: none;
+        z-index: 2;
+
+        @media(min-width: $desktop-min) {
+            height: 100%;
+            left: 48%;
+            margin: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+
+        img {
+            max-height: 90vh;
+            object-fit: contain;
+            position: sticky;
+            top: 10%;
+        }
+    }
+}

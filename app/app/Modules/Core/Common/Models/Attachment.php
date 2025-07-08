@@ -83,7 +83,7 @@ class Attachment extends OrchidAttachment
         $disk = Storage::disk($this->getAttribute('disk'));
         $path = $this->physicalPath();
 
-        if (is_null($path) || !$disk->exists($path)) {
+        if ($path === null || !$disk->exists($path)) {
             return $default;
         }
 

@@ -20,9 +20,9 @@ abstract class PublishableModelRepository extends ModelRepository
      *
      * @return Model|null
      */
-    public function findById(int $id, bool $withDrafts = false): ?Model
+    public function findOneById(int $id, bool $withDrafts = false): ?Model
     {
-        $query = $this->getQueryBuilder()
+        $query = $this->queryBuilder()
             ->where('id', '=', $id);
 
         if ($withDrafts) {

@@ -1,17 +1,22 @@
 @php
 use App\Modules\Databank\Common\Enums\CookieName;
-use App\Modules\Databank\Common\Enums\MediaType;
-use App\Modules\Databank\Common\Models\Faction;
-use App\Modules\Databank\Common\Models\Media;
-use App\Modules\Databank\Public\Enums\VehicleRouteName;
+use App\Modules\Databank\Public\Enums\DatabankRouteName;
+use App\Modules\Droid\Common\Models\Droid;
+use App\Modules\Droid\Public\Enums\DroidRouteName;
+use App\Modules\Faction\Common\Models\Faction;
+use App\Modules\Media\Common\Enums\MediaType;
+use App\Modules\Media\Common\Models\Media;
+use App\Modules\Vehicle\Common\Models\Vehicle;
+use App\Modules\Vehicle\Public\Enums\VehicleRouteName;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cookie;
 
 /**
- * @var int $vehiclesCount
- * @var Collection<Faction> $factions
- * @var Collection<MediaType> $availableMediaTypes
- * @var Collection<Media> $media
+ * @var Collection<int, Vehicle> $vehicles
+ * @var Collection<int, Droid> $droids
+ * @var Collection<int, Faction> $factions
+ * @var Collection<int, MediaType> $availableMediaTypes
+ * @var Collection<int, Media> $media
  */
 
 $skipInto = (Cookie::get(CookieName::SKIP_INTRO->value) === 'Y');
@@ -31,17 +36,42 @@ $skipInto = (Cookie::get(CookieName::SKIP_INTRO->value) === 'Y');
     @endif
 
     <section class="container explore">
-        <div class="heading-wrapper heading-wrapper--main">
-            <div class="page-title">
-                <h1 class="wow fadeInUp">{{ __('Explore') }}</h1>
-                <noindex>
-                    <p class="aurebesh wow fadeInUp" data-wow-delay="100ms">{{ __('Explore') }}</p>
-                </noindex>
-            </div>
-            <a href="{{ route(name: VehicleRouteName::LIST, absolute: false) }}"
-               class="button button--yellow wow fadeInUp" data-wow-delay="200ms">
-                <span class="rogue-icon"><noindex>1</noindex></span>
-                <span>{{ __('All :count vehicles', ['count' => $vehiclesCount]) }}</span>
+        <div class="page-title">
+            <h1 class="wow fadeInUp">{{ __('Explore') }}</h1>
+            <noindex>
+                <p class="aurebesh wow fadeInUp" data-wow-delay="100ms">{{ __('Explore') }}</p>
+            </noindex>
+        </div>
+
+        <div class="entity-explorer js-explorer">
+            <a href="{{ route(name: VehicleRouteName::INDEX, absolute: false) }}"
+               class="entity-explorer__item js-explorer-item wow fadeInUp" data-wow-delay="200ms">
+                @foreach ($vehicles as $i => $vehicle)
+                    <div class="entity-explorer__card js-explorer-card @if ($i === 0) is-active @endif">
+                        <picture>
+                            <img src="{{ $vehicle->image->medium_url }}"
+                                 alt="{{ $vehicle->name }}">
+                        </picture>
+                    </div>
+                @endforeach
+                <div class="entity-explorer__overlay">
+                    <h2 class="entity-explorer__title">{{ __('Vehicles') }}</h2>
+                </div>
+            </a>
+
+            <a href="{{ route(name: DroidRouteName::INDEX, absolute: false) }}"
+               class="entity-explorer__item js-explorer-item wow fadeInUp" data-wow-delay="200ms">
+                @foreach ($droids as $i => $droid)
+                    <div class="entity-explorer__card js-explorer-card @if ($i === 0) is-active @endif">
+                        <picture>
+                            <img src="{{ $droid->image->medium_url }}"
+                                 alt="{{ $droid->name }}">
+                        </picture>
+                    </div>
+                @endforeach
+                <div class="entity-explorer__overlay">
+                    <h2 class="entity-explorer__title">{{ __('Droids') }}</h2>
+                </div>
             </a>
         </div>
     </section>
@@ -56,8 +86,10 @@ $skipInto = (Cookie::get(CookieName::SKIP_INTRO->value) === 'Y');
 
         <div class="factions-selector wow fadeIn" data-wow-delay="500ms">
             @foreach ($factions as $i => $faction)
-                <a href="{{ route(VehicleRouteName::LIST, ['faction[]' => $faction->slug], false) }}"
-                   class="factions-selector__item wow fadeInUp" data-wow-delay="{{ (($i + 1) * 100) }}ms">
+                <a href="{{ route(DatabankRouteName::EXPLORE, [
+                    'type' => 'faction',
+                    'slug' => $faction->slug,
+                ], false) }}" class="factions-selector__item wow fadeInUp" data-wow-delay="{{ (($i + 1) * 100) }}ms">
                     <div class="factions-selector__emblem faction-emblem faction-emblem--{{ $faction->slug }}">
                         <svg>
                             <use xlink:href="#emblem-{{ $faction->slug }}"></use>
@@ -106,8 +138,9 @@ $skipInto = (Cookie::get(CookieName::SKIP_INTRO->value) === 'Y');
                     <li class="appearances__wrapper wow fadeInUp js-appearance"
                         data-media-type="{{ $mediaItem->type->value }}"
                         data-wow-delay="{{ (($i + 1) * 50) }}ms">
-                        @include('public.vehicles.partials.appearance-item', [
-                            'appearance' => $mediaItem,
+                        @include('public.media.partials.item-content', [
+                            'routeName' => DatabankRouteName::EXPLORE,
+                            'media' => $mediaItem,
                         ])
                     </li>
                     @php

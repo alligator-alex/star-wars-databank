@@ -1,9 +1,9 @@
 export * from "./global/index";
 
 import ExtendedSelectController from "./controllers/ExtendedSelect";
-import VehicleListPageSettingsController from "./controllers/VehicleListPageSettings";
-import VehicleDetailPageSettingsController from "./controllers/VehicleDetailPageSettings";
+import EntityIndexPageSettingsController from "./controllers/EntityIndexPageSettings";
+import EntityDetailPageSettingsController from "./controllers/EntityDetailPageSettings";
 
 window.application.register("extended-select", ExtendedSelectController as RegistrationOptions);
-window.application.register("vehicle-list-page-settings", VehicleListPageSettingsController as RegistrationOptions);
-window.application.register("vehicle-detail-page-settings", VehicleDetailPageSettingsController as RegistrationOptions);
+window.application.register("entity-index-page-settings", EntityIndexPageSettingsController as RegistrationOptions);
+window.application.register("entity-detail-page-settings", EntityDetailPageSettingsController as RegistrationOptions);

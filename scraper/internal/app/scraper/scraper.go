@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sw-vehicles/internal/app/appearance"
 	"sw-vehicles/internal/app/core"
+	"sw-vehicles/internal/app/droid"
 	"sw-vehicles/internal/app/helpers"
 	"sw-vehicles/internal/app/logger"
 	"sw-vehicles/internal/app/vehicle"
@@ -36,8 +37,10 @@ type Scraper struct {
 	pageNum             int
 	totalVisited        int
 	totalScraped        int
+	coreParser          core.Parser
 	appearanceParser    appearance.Parser
 	vehicleParser       vehicle.Parser
+	droidParser         droid.Parser
 }
 
 func NewScraper(brokerClient BrokerClient) Scraper {
@@ -249,20 +252,47 @@ func (s *Scraper) scrapeNavPage(page *colly.HTMLElement) {
 }
 
 func (s *Scraper) scrapeDetailPage(page *colly.HTMLElement) {
+	pageType := s.detectPageType(page)
 	paddedUrl := helpers.PadStringRight(page.Request.URL.String(), urlPadSize, urlPadSymbol)
 
-	if !s.isVehiclePage(page) {
-		s.logger.Log("-", paddedUrl, "skipped (not a vehicle)")
+	if pageType == pageTypeUnsupported {
+		s.logger.Log("-", paddedUrl, "skipped (unsupported page type)")
 		return
+	}
+
+	if pageType == pageTypeAppearance {
+		s.logger.Log("-", paddedUrl, "skipped (appearance page)")
+		return
+	}
+
+	var pageTypeReadable string
+
+	switch pageType {
+	case pageTypeVehicle:
+		pageTypeReadable = "vehicle"
+	case pageTypeDroid:
+		pageTypeReadable = "droid"
+	default:
+		pageTypeReadable = "unsupported"
 	}
 
 	appearances := s.collectAppearances(page)
 	if len(appearances) == 0 {
-		s.logger.Log("-", paddedUrl, "skipped (no appearances)")
+		s.logger.Log("-", paddedUrl, "skipped:", pageTypeReadable, "(no appearances)")
 		return
 	}
 
-	dto := s.vehicleParser.Parse(page, appearances)
+	var dto interface{}
+
+	switch pageType {
+	case pageTypeVehicle:
+		dto = s.vehicleParser.Parse(page, appearances)
+	case pageTypeDroid:
+		dto = s.droidParser.Parse(page, appearances)
+	default:
+		s.logger.Log("-", paddedUrl, "unable to parse unsupported page type")
+		return
+	}
 
 	if err := s.publishToBroker(dto); err != nil {
 		s.logger.Log("-", paddedUrl, "unable to publish to broker:", err)
@@ -270,7 +300,7 @@ func (s *Scraper) scrapeDetailPage(page *colly.HTMLElement) {
 	}
 
 	s.totalScraped++
-	s.logger.Log("-", paddedUrl, "scraped")
+	s.logger.Log("-", paddedUrl, "scraped:", pageTypeReadable)
 }
 
 func (s *Scraper) publishToBroker(dto interface{}) error {
@@ -288,8 +318,41 @@ func (s *Scraper) isErrorAlreadyVisited(err error) bool {
 	return errors.As(err, &alreadyVisitedError)
 }
 
-func (s *Scraper) isVehiclePage(page *colly.HTMLElement) bool {
-	pageTemplates := []core.PageTemplate{
+func (s *Scraper) detectPageType(page *colly.HTMLElement) PageType {
+	url, exists := s.coreParser.FindPageInfobox(page).Find(".plainlinks > a").Attr("href")
+	if !exists {
+		return pageTypeUnsupported
+	}
+
+	pageTemplate := core.PageTemplate(s.coreParser.ExtractPageUrlTemplateName(url))
+
+	if s.isAppearanceTemplate(pageTemplate) {
+		return pageTypeAppearance
+	}
+
+	if s.isVehicleTemplate(pageTemplate) {
+		return pageTypeVehicle
+	}
+
+	if s.isDroidTemplate(pageTemplate) {
+		return pageTypeDroid
+	}
+
+	return pageTypeUnsupported
+}
+
+func (s *Scraper) isAppearanceTemplate(template core.PageTemplate) bool {
+	return s.coreParser.IsPageTemplateSupported(template, []core.PageTemplate{
+		appearance.TemplateMovie,
+		appearance.TemplateTvSeries,
+		appearance.TemplateVideoGame,
+		appearance.TemplateBook,
+		appearance.TemplateComicBook,
+	})
+}
+
+func (s *Scraper) isVehicleTemplate(template core.PageTemplate) bool {
+	return s.coreParser.IsPageTemplateSupported(template, []core.PageTemplate{
 		vehicle.TemplateAirVehicle,
 		vehicle.TemplateAquaticVehicle,
 		vehicle.TemplateGroundVehicle,
@@ -297,25 +360,18 @@ func (s *Scraper) isVehiclePage(page *colly.HTMLElement) bool {
 		vehicle.TemplateSpaceStation,
 		vehicle.TemplateStarshipClass,
 		vehicle.TemplateVehicle,
-	}
-
-	return s.vehicleParser.IsPageOneOfTemplates(page, pageTemplates)
+	})
 }
 
-func (s *Scraper) isAppearancePage(page *colly.HTMLElement) bool {
-	pageTemplates := []core.PageTemplate{
-		appearance.TemplateMovie,
-		appearance.TemplateTvSeries,
-		appearance.TemplateVideoGame,
-		appearance.TemplateBook,
-		appearance.TemplateComicBook,
-	}
-
-	return s.appearanceParser.IsPageOneOfTemplates(page, pageTemplates)
+func (s *Scraper) isDroidTemplate(template core.PageTemplate) bool {
+	return s.coreParser.IsPageTemplateSupported(template, []core.PageTemplate{
+		droid.TemplateDroid,
+		droid.TemplateDroidSeries,
+	})
 }
 
-func (s *Scraper) collectAppearances(page *colly.HTMLElement) []appearance.DTO {
-	var appearances []appearance.DTO
+func (s *Scraper) collectAppearances(page *colly.HTMLElement) []core.AppearanceDTO {
+	var appearances []core.AppearanceDTO
 
 	// at first, we must collect appearance items
 	heading := page.DOM.Find("#Appearances")
@@ -334,12 +390,16 @@ func (s *Scraper) collectAppearances(page *colly.HTMLElement) []appearance.DTO {
 		return appearances
 	}
 
-	var dto appearance.DTO
+	var dto core.AppearanceDTO
 
 	appearancePageCollector := s.newCollector(10)
 
 	// then we need to register an event to parse target page (when collector receives html)
 	appearancePageCollector.OnHTML("main.page__main", func(page *colly.HTMLElement) {
+		if s.detectPageType(page) != pageTypeAppearance {
+			return
+		}
+
 		dto = s.appearanceParser.Parse(page)
 	})
 
@@ -359,7 +419,7 @@ func (s *Scraper) collectAppearances(page *colly.HTMLElement) []appearance.DTO {
 
 		appearancePageCollector.Wait()
 
-		if dto.Name == "" {
+		if (dto.Name == "") || (dto.Type == "") {
 			return
 		}
 

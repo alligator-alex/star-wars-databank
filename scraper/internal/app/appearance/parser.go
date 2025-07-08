@@ -17,29 +17,17 @@ func NewParser() Parser {
 	return Parser{}
 }
 
-// Parse starts the parsing process.
-func (p *Parser) Parse(page *colly.HTMLElement) DTO {
+// Parse starts the parsing process of the appearance page.
+func (p *Parser) Parse(page *colly.HTMLElement) core.AppearanceDTO {
 	infobox := p.FindPageInfobox(page)
 
-	return DTO{
+	return core.AppearanceDTO{
 		Name:        p.ParsePageTitle(page),
 		URL:         page.Request.URL.String(),
 		ImageURL:    p.ParseImageUrl(infobox),
 		Type:        core.NullableString(p.parseWorkOfArtType(infobox)),
 		ReleaseDate: core.NullableString(p.parseWorkOfArtReleaseDate(infobox)),
 	}
-}
-
-func (p *Parser) isValidTemplate(page *colly.HTMLElement) bool {
-	pageTemplates := []core.PageTemplate{
-		TemplateMovie,
-		TemplateTvSeries,
-		TemplateVideoGame,
-		TemplateBook,
-		TemplateComicBook,
-	}
-
-	return p.IsPageOneOfTemplates(page, pageTemplates)
 }
 
 func (p *Parser) parseWorkOfArtType(infoboxSelection *goquery.Selection) string {

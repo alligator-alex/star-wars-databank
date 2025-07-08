@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use Artisan;
 use Faker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
@@ -14,9 +13,9 @@ abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
     use RefreshDatabase;
+    protected const string HEADING_CLASS_NAME = 'wow fadeInUp';
 
-    public bool $setupDatabase = true;
-    protected Faker\Generator $faker;
+    protected bool $seed = true;
 
     protected function setUp(): void
     {
@@ -24,17 +23,6 @@ abstract class TestCase extends BaseTestCase
 
         Storage::fake('public');
 
-        if ($this->setupDatabase) {
-            $this->setupDatabase();
-        }
-
         $this->faker = Faker\Factory::create();
-    }
-
-    private function setupDatabase(): void
-    {
-        Artisan::call('migrate');
-
-        $this->setupDatabase = false;
     }
 }

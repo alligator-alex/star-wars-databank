@@ -9,14 +9,30 @@ use Tests\TestCase;
 
 class ConsoleCommandsHelperTest extends TestCase
 {
-    public function testCanGetPathsInsideModules(): void
+    public function testGetPathsInsideModules(): void
     {
         $result = ConsoleCommandsHelper::getPathsInsideModules();
 
-        $this->assertCount(3, $result);
+        $modules = [
+            'Core',
+            'Databank',
+            'Droid',
+            'Faction',
+            'Handbook',
+            'Manufacturer',
+            'Media',
+            'MessageBroker',
+            'Sitemap',
+            'Vehicle',
+        ];
 
-        $this->assertEquals('/var/www/app/app/Modules/Core/Console/Commands', $result[0]);
-        $this->assertEquals('/var/www/app/app/Modules/Databank/Console/Commands', $result[1]);
-        $this->assertEquals('/var/www/app/app/Modules/MessageBroker/Console/Commands', $result[2]);
+        $this->assertCount(count($modules), $result);
+
+        foreach ($modules as $key => $module) {
+            $this->assertEquals(app_path('Modules'
+                . DIRECTORY_SEPARATOR . $module
+                . DIRECTORY_SEPARATOR . 'Console'
+                . DIRECTORY_SEPARATOR . 'Commands'), $result[$key]);
+        }
     }
 }

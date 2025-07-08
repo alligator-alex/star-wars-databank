@@ -1,2 +1,4 @@
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /vendor
+Sitemap: https://star-wars-databank.online/sitemap.xml

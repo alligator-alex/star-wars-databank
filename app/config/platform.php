@@ -318,6 +318,6 @@ return [
      |
      */
 
-    'provider' => \App\Modules\Core\Common\Providers\AdminServiceProvider::class,
+    'provider' => \App\Modules\Databank\Common\Providers\DatabankServiceProvider::class,
 
 ];

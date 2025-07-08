@@ -13,7 +13,7 @@ class ConsoleCommandsHelper
      */
     public static function getPathsInsideModules(): array
     {
-        $modulesPath = base_path('app/Modules');
+        $modulesPath = app_path('Modules');
         if (!is_dir($modulesPath)) {
             return [];
         }

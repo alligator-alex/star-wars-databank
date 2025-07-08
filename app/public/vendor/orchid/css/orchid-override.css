@@ -6,13 +6,13 @@
     object-fit: contain;
 }
 
-.list-image-preview {
+.index-image-preview {
     width: 100px;
     display: block;
     text-align: center;
 }
 
-.list-image-preview img {
+.index-image-preview img {
     max-height: 100px;
     max-width: 100%;
 }

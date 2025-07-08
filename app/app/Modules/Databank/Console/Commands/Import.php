@@ -6,13 +6,14 @@ namespace App\Modules\Databank\Console\Commands;
 
 use App\Modules\Databank\Import\Contracts\Importer;
 use App\Modules\Databank\Import\Contracts\Parser;
+use App\Modules\Databank\Import\Enums\EntityType;
 use App\Modules\MessageBroker\Common\Contracts\Consumer;
 use Illuminate\Console\Command;
 use Throwable;
 
 class Import extends Command
 {
-    protected $signature = 'databank:import {--skip-existing}';
+    protected $signature = 'databank:import {--skip-existing} {--type=}';
 
     public function __construct(
         private readonly Consumer $consumer,
@@ -25,6 +26,7 @@ class Import extends Command
     public function handle(): void
     {
         $skipExisting = (bool) $this->option('skip-existing');
+        $type = EntityType::tryFrom((string) $this->option('type'));
 
         $this->alert('Full import may take up to 3 hours to process over 197 000 pages!');
 
@@ -39,7 +41,10 @@ class Import extends Command
         }
 
         try {
-            $this->importer->import($this->parser->parse($this->consumer->getMessages()), $skipExisting);
+            $this->importer->import(
+                $this->parser->parse($this->consumer->getMessages(), $type),
+                $skipExisting
+            );
 
             $this->call('databank:disable-unused-relations');
         } catch (Throwable $e) {

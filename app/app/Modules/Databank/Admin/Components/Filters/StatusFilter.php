@@ -53,7 +53,7 @@ class StatusFilter extends Filter
                 ->fromEnum(Status::class, 'nameForHumans')
                 ->empty(__('Any'))
                 ->set('placeholder', __('Any'))
-                ->value((int) $this->request->get('status')),
+                ->value($this->request->has('status') ? (int) $this->request->get('status') : null),
         ];
     }
 }

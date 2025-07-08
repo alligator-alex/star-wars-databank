@@ -20,7 +20,7 @@ abstract class ModelRepository
      *
      * @return TModel
      */
-    public function getNewModel(): Model
+    public function newModel(): Model
     {
         return new $this->modelClass();
     }
@@ -28,11 +28,12 @@ abstract class ModelRepository
     /**
      * Get query builder instance for model.
      *
-     * @return Builder<TModel>
+     * @return Builder<TModel>|TModel
+     * @phpstan-return Builder<TModel>
      */
-    public function getQueryBuilder(): Builder
+    public function queryBuilder(): Builder
     {
-        /** @var Builder<TModel> $query */
+        /** @var Builder<TModel>|TModel $query */
         $query = $this->modelClass::query();
 
         return $query;
@@ -45,9 +46,9 @@ abstract class ModelRepository
      *
      * @return TModel|null
      */
-    public function findById(int $id): ?Model
+    public function findOneById(int $id): ?Model
     {
-        return $this->getQueryBuilder()
+        return $this->queryBuilder()
             ->where('id', '=', $id)
             ->first();
     }

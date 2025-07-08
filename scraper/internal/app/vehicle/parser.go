@@ -4,7 +4,6 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gocolly/colly/v2"
 	"strings"
-	"sw-vehicles/internal/app/appearance"
 	"sw-vehicles/internal/app/core"
 	"sw-vehicles/internal/app/helpers"
 )
@@ -19,23 +18,19 @@ func NewParser() Parser {
 	return Parser{}
 }
 
-// Parse starts the parsing process.
-func (p *Parser) Parse(page *colly.HTMLElement, appearances []appearance.DTO) DTO {
+// Parse starts the parsing process of the vehicle page.
+func (p *Parser) Parse(page *colly.HTMLElement, appearances []core.AppearanceDTO) DTO {
 	infobox := p.FindPageInfobox(page)
 
 	return DTO{
-		Name:                    p.ParsePageTitle(page),
+		EntityType:              core.EntityTypeVehicle,
+		MainInfo:                p.GetMainInfo(page),
 		Category:                p.parseCategory(infobox),
 		Line:                    core.NullableString(p.parseLine(infobox)),
 		Type:                    core.NullableString(p.parseType(infobox)),
-		ImageURL:                p.ParseImageUrl(infobox),
-		Description:             p.ParsePageText(page),
-		URL:                     page.Request.URL.Scheme + "://" + page.Request.URL.Host + page.Request.URL.Path,
-		RelatedURL:              core.NullableString(p.ParseCanonRelatedURL(page)),
 		Manufacturers:           p.parseManufacturers(infobox),
-		Factions:                p.parseFactions(infobox),
 		TechnicalSpecifications: p.parseTechnicalSpecifications(infobox),
-		IsCanon:                 p.IsCanonPage(page),
+		Factions:                p.ParseFactions(infobox),
 		Appearances:             appearances,
 	}
 }
