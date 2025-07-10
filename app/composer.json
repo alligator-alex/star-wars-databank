@@ -8,9 +8,9 @@
         "ext-fileinfo": "*",
         "ext-sockets": "*",
         "ext-xmlwriter": "*",
-        "cviebrock/eloquent-sluggable": "^11",
+        "cviebrock/eloquent-sluggable": "^12",
         "larastan/larastan": "^3",
-        "laravel/framework": "^11",
+        "laravel/framework": "^12",
         "laravel/tinker": "^2",
         "orchid/platform": "^14",
         "php-amqplib/php-amqplib": "^3"
@@ -22,7 +22,7 @@
         "laravel/sail": "^1",
         "mockery/mockery": "^1",
         "nunomaduro/collision": "^8",
-        "phpunit/phpunit": "^11"
+        "phpunit/phpunit": "^12"
     },
     "autoload": {
         "psr-4": {

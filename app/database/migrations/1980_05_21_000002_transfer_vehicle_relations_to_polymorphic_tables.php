@@ -40,7 +40,7 @@ return new class extends Migration
             DB::table('factionables')->insert([
                 'faction_id' => (int) $model->faction_id,
                 'factionable_id' => (int) $model->vehicle_id,
-                'factionable_type' => 1,
+                'factionable_type' => self::ENTITY_TYPE_VEHICLE,
                 'main' => (bool) $model->main,
             ]);
         });
@@ -64,7 +64,7 @@ return new class extends Migration
             DB::table('manufacturables')->insert([
                 'manufacturer_id' => (int) $model->manufacturer_id,
                 'manufacturable_id' => (int) $model->vehicle_id,
-                'manufacturable_type' => 1,
+                'manufacturable_type' => self::ENTITY_TYPE_VEHICLE,
             ]);
         });
 
@@ -87,7 +87,7 @@ return new class extends Migration
             DB::table('mediables')->insert([
                 'media_id' => (int) $model->media_id,
                 'mediable_id' => (int) $model->vehicle_id,
-                'mediable_type' => 1,
+                'mediable_type' => self::ENTITY_TYPE_VEHICLE,
             ]);
         });
 

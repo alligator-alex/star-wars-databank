@@ -178,7 +178,7 @@ class DroidDetailController extends BaseDetailController
             Alert::error($e->getMessage());
         }
 
-        return redirect()->route(DroidRouteName::INDEX);
+        return redirect()->route(DroidRouteName::INDEX, $request->query());
     }
 
     public function updateIndexPageSettings(int $id, UpdateIndexPageSettings $request): RedirectResponse

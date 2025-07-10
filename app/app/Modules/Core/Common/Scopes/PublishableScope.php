@@ -4,26 +4,14 @@ declare(strict_types=1);
 
 namespace App\Modules\Core\Common\Scopes;
 
-use App\Modules\Core\Common\Components\Model;
 use App\Modules\Databank\Common\Enums\Status;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model as EloquentModel;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 
-/**
- * @template TModel of Model
- */
 class PublishableScope implements Scope
 {
-    /**
-     * Apply the scope to a given Eloquent query builder.
-     *
-     * @param Builder<TModel> $builder
-     * @param Model $model
-     *
-     * @return void
-     */
-    public function apply(Builder $builder, EloquentModel $model): void
+    public function apply(Builder $builder, Model $model): void
     {
         $builder->where('status', '=', Status::PUBLISHED->value);
     }
@@ -36,11 +24,7 @@ class PublishableScope implements Scope
     }
 
     /**
-     * Add the with-drafts extension to the builder.
-     *
-     * @param Builder<TModel> $builder
-     *
-     * @return void
+     * Add the "withDrafts" extension to the builder.
      */
     protected function addWithDrafts(Builder $builder): void
     {
@@ -51,11 +35,7 @@ class PublishableScope implements Scope
     }
 
     /**
-     * Add the without-drafts extension to the builder.
-     *
-     * @param Builder<TModel> $builder
-     *
-     * @return void
+     * Add the "withoutDrafts" extension to the builder.
      */
     protected function addWithoutDrafts(Builder $builder): void
     {
@@ -68,11 +48,7 @@ class PublishableScope implements Scope
     }
 
     /**
-     * Add the only-drafts extension to the builder.
-     *
-     * @param Builder<TModel> $builder
-     *
-     * @return void
+     * Add the "onlyDrafts" extension to the builder.
      */
     protected function addOnlyDrafts(Builder $builder): void
     {

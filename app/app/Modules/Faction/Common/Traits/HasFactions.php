@@ -6,7 +6,6 @@ namespace App\Modules\Faction\Common\Traits;
 
 use App\Modules\Faction\Common\Models\Faction;
 use App\Modules\Faction\Common\Models\Pivots\Factionable;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
@@ -37,21 +36,24 @@ trait HasFactions
         return $this->hasOneThrough(
             Faction::class,
             Factionable::class,
-            'factionable_id',
+            Factionable::RELATION . '_id',
             'id',
             'id',
             'faction_id'
-        )->where(Factionable::tableName() . '.main', '=', true);
+        )->where(Factionable::RELATION . '_type', '=', $this->getMorphClass())
+            ->where(Factionable::tableName() . '.main', '=', true);
     }
 
     /**
      * Other factions (except main one).
      *
-     * @return BelongsToMany<Faction, covariant self>
+     * @return MorphToMany<Faction, covariant self, Factionable>
      */
-    public function otherFactions(): BelongsToMany
+    public function otherFactions(): MorphToMany
     {
-        return $this->factions()
-            ->whereNot(Factionable::tableName() . '.main', '=', true);
+        /** @var MorphToMany<Faction, covariant self, Factionable> $query */
+        $query = $this->factions()->whereNot(Factionable::tableName() . '.main', '=', true);
+
+        return $query;
     }
 }

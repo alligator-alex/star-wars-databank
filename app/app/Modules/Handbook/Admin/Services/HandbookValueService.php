@@ -26,7 +26,7 @@ class HandbookValueService
      * @param int $handbookId
      * @param Selection|null $filter
      *
-     * @return LengthAwarePaginator<HandbookValue>
+     * @return LengthAwarePaginator<int, HandbookValue>
      */
     public function findPaginated(int $handbookId, ?Selection $filter = null): LengthAwarePaginator
     {

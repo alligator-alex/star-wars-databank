@@ -22,6 +22,7 @@ use App\Modules\Vehicle\Admin\Requests\UpdateRequest;
 use App\Modules\Vehicle\Admin\Services\VehicleService;
 use App\Modules\Vehicle\Common\Models\Vehicle;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Orchid\Screen\Actions\ModalToggle;
 use Orchid\Screen\Layout;
 use Orchid\Screen\Layouts\Modal;
@@ -166,7 +167,7 @@ class VehicleDetailController extends BaseDetailController
         return redirect()->route(VehicleRouteName::INDEX);
     }
 
-    public function togglePublish(int $id): RedirectResponse
+    public function togglePublish(int $id, Request $request): RedirectResponse
     {
         try {
             $model = $this->service->togglePublish($id);
@@ -178,7 +179,7 @@ class VehicleDetailController extends BaseDetailController
             Alert::error($e->getMessage());
         }
 
-        return redirect()->route(VehicleRouteName::INDEX);
+        return redirect()->route(VehicleRouteName::INDEX, $request->query());
     }
 
     public function updateIndexPageSettings(int $id, UpdateIndexPageSettings $request): RedirectResponse

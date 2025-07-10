@@ -11,8 +11,9 @@ use Illuminate\Support\ServiceProvider;
 
 class MorphServiceProvider extends ServiceProvider
 {
-    public function register(): void
+    public function boot(): void
     {
+        /** @phpstan-ignore argument.type */
         Relation::morphMap([
             1 => Vehicle::class,
             2 => Droid::class,

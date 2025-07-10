@@ -39,7 +39,7 @@ abstract class BaseService
      *
      * @param Selection|null $filter
      *
-     * @return LengthAwarePaginator<TModel>
+     * @return LengthAwarePaginator<int, TModel>
      */
     public function findPaginated(?Selection $filter = null): LengthAwarePaginator
     {
