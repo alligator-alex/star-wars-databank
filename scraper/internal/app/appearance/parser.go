@@ -24,7 +24,7 @@ func (p *Parser) Parse(page *colly.HTMLElement) core.AppearanceDTO {
 	return core.AppearanceDTO{
 		Name:        p.ParsePageTitle(page),
 		URL:         page.Request.URL.String(),
-		ImageURL:    p.ParseImageUrl(infobox),
+		ImageURL:    p.ParseMainImageUrl(infobox),
 		Type:        core.NullableString(p.parseWorkOfArtType(infobox)),
 		ReleaseDate: core.NullableString(p.parseWorkOfArtReleaseDate(infobox)),
 	}

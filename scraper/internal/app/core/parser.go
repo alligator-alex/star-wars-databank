@@ -16,7 +16,7 @@ func (p *Parser) GetMainInfo(page *colly.HTMLElement) MainInfoDTO {
 
 	return MainInfoDTO{
 		Name:        p.ParsePageTitle(page),
-		ImageURL:    p.ParseImageUrl(infobox),
+		ImageURL:    p.ParseMainImageUrl(infobox),
 		Description: p.ParsePageText(page),
 		URL:         page.Request.URL.Scheme + "://" + page.Request.URL.Host + page.Request.URL.Path,
 		RelatedURL:  NullableString(p.ParseCanonRelatedURL(page)),
@@ -140,9 +140,14 @@ func (p *Parser) ParsePageText(page *colly.HTMLElement) string {
 	return strings.TrimSpace(description)
 }
 
-// ParseImageUrl extracts the first image URL from the infobox, which is used as the main image.
-func (p *Parser) ParseImageUrl(infoboxSelection *goquery.Selection) string {
+// ParseMainImageUrl extracts the first image URL from the infobox, which is used as the main image.
+func (p *Parser) ParseMainImageUrl(infoboxSelection *goquery.Selection) string {
 	imageSelection := infoboxSelection.Find(`figure[data-source="image"]`)
+
+	if imageSelection.Length() == 0 {
+		imageSelection = infoboxSelection.Find(`div[data-source="imagefallback"]`).Find("figure")
+	}
+
 	if imageSelection.Length() == 0 {
 		return ""
 	}
