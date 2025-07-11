@@ -232,7 +232,7 @@ class VehicleService extends EntityService
         }
 
         foreach ($techSpecsData as $techSpec) {
-            $value = trim((string)$techSpec['value']) ?: null;
+            $value = trim((string) $techSpec['value']) ?: null;
             if (!$value) {
                 continue;
             }

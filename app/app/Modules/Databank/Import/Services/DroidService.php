@@ -225,15 +225,15 @@ class DroidService extends EntityService
         $dto = new TechSpecs();
 
         foreach ($techSpecsData as $techSpec) {
-            $value = trim((string)$techSpec['value']) ?: null;
+            $value = trim((string) $techSpec['value']) ?: null;
             if (!$value) {
                 continue;
             }
 
             $method = match ($techSpec['name']) {
-                'height' => 'setHeight',
-                'mass' => 'setMass',
-                'gender' => 'setGender',
+                'Height' => 'setHeight',
+                'Mass' => 'setMass',
+                'Gender' => 'setGender',
                 default => null,
             };
 
