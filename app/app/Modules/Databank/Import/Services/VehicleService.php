@@ -360,7 +360,8 @@ class VehicleService extends EntityService
             }
 
             if ($description) {
-                $vehicle->description = DescriptionHelper::beautify($description, $vehicle->name);
+                $vehicle->description = $description;
+                DescriptionHelper::beautify($vehicle);
             }
 
             if ($category && !empty($dto->getTechSpecs())) {

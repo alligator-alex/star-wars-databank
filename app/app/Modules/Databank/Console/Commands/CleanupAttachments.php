@@ -39,6 +39,7 @@ class CleanupAttachments extends Command
                 $this->line('Processing Attachment #' . $attachment->id . ' (' . $attachment->relative_url . ')');
 
                 /** @var Media|null $media */
+                /** @phpstan-ignore-next-line */
                 $media = $this->mediaRepository->queryBuilder()
                     ->withDrafts()
                     ->where('poster_id', '=', $attachment->id)
@@ -51,6 +52,7 @@ class CleanupAttachments extends Command
                 }
 
                 /** @var Vehicle|null $vehicle */
+                /** @phpstan-ignore-next-line */
                 $vehicle = $this->vehicleRepository->queryBuilder()
                     ->withDrafts()
                     ->where('image_id', '=', $attachment->id)
@@ -63,6 +65,7 @@ class CleanupAttachments extends Command
                 }
 
                 /** @var Droid|null $droid */
+                /** @phpstan-ignore-next-line */
                 $droid = $this->droidRepository->queryBuilder()
                     ->withDrafts()
                     ->where('image_id', '=', $attachment->id)

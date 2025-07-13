@@ -345,7 +345,8 @@ class DroidService extends EntityService
             }
 
             if ($description) {
-                $droid->description = DescriptionHelper::beautify($description, $droid->name);
+                $droid->description = $description;
+                DescriptionHelper::beautify($droid);
             }
 
             if (!empty($dto->getTechSpecs())) {

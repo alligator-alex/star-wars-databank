@@ -12,6 +12,7 @@ use App\Modules\Databank\Common\Enums\AttachmentGroup;
 use App\Modules\Databank\Common\Enums\Status;
 use App\Modules\Droid\Common\DTOs\TechSpecs;
 use App\Modules\Droid\Common\Factories\DroidFactory;
+use App\Modules\Droid\Public\Enums\DroidRouteName;
 use App\Modules\Faction\Common\Models\Faction;
 use App\Modules\Faction\Common\Traits\HasFactions;
 use App\Modules\Handbook\Common\Enums\HandbookType;
@@ -21,6 +22,7 @@ use App\Modules\Manufacturer\Common\Models\Manufacturer;
 use App\Modules\Manufacturer\Common\Traits\HasManufacturers;
 use App\Modules\Media\Common\Models\Media;
 use App\Modules\Media\Common\Traits\HasAppearances;
+use App\Modules\Sitemap\Common\Contracts\Sitemappable;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -95,7 +97,7 @@ use Orchid\Screen\AsSource;
  * @method static Builder<static>|Droid whereUpdatedAt($value)
  * @method static Builder<static>|Droid withUniqueSlugConstraints(Model $model, string $attribute, array $config, string $slug)
  */
-class Droid extends Model
+class Droid extends Model implements Sitemappable
 {
     use AsSource;
     use Attachable;
@@ -218,5 +220,15 @@ class Droid extends Model
     public function getPageSettings(): PageSettings
     {
         return PageSettings::hydrate((array) $this->page_settings);
+    }
+
+    public function getSitemapUrl(): ?string
+    {
+        return route(DroidRouteName::DETAIL, ['slug' => $this->slug]);
+    }
+
+    public function getSitemapModificationDate(): ?Carbon
+    {
+        return $this->updated_at;
     }
 }
