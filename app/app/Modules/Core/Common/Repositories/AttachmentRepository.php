@@ -16,7 +16,7 @@ class AttachmentRepository
      *
      * @return Builder<Attachment>
      */
-    public function getQueryBuilder(): Builder
+    public function queryBuilder(): Builder
     {
         return $this->modelClass::query();
     }
@@ -30,7 +30,7 @@ class AttachmentRepository
      */
     public function findById(int $id): ?Attachment
     {
-        return $this->getQueryBuilder()
+        return $this->queryBuilder()
             ->where('id', '=', $id)
             ->first();
     }

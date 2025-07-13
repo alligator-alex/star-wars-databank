@@ -122,7 +122,13 @@
         }
 
         a {
-            color: $yellow;
+            color: $blue;
+            text-decoration: underline;
+            transition-property: color, text-decoration-color;
+
+            &:hover {
+                text-decoration-color: transparent;
+            }
         }
     }
 

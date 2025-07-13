@@ -25,19 +25,21 @@ class BeautifyDescription extends Command
     public function handle(): void
     {
         $this->vehicleRepository->queryBuilder()->lazyById()->each(function (Vehicle $model): void {
-            $this->output->writeln('Processing Vehicle #' . $model->id . ' - "' . $model->name . '"...');
+            $this->line('Processing Vehicle #' . $model->id . ' - "' . $model->name . '"...');
 
-            $model->description = DescriptionHelper::beautify($model->description, $model->name);
+            DescriptionHelper::beautify($model);
+            DescriptionHelper::injectRelatedUrls($model);
 
-            $model->save();
+            $this->vehicleRepository->save($model);
         });
 
         $this->droidRepository->queryBuilder()->lazyById()->each(function (Droid $model): void {
-            $this->output->writeln('Processing Droid #' . $model->id . ' - "' . $model->name . '"...');
+            $this->line('Processing Droid #' . $model->id . ' - "' . $model->name . '"...');
 
-            $model->description = DescriptionHelper::beautify($model->description, $model->name);
+            DescriptionHelper::beautify($model);
+            DescriptionHelper::injectRelatedUrls($model);
 
-            $model->save();
+            $this->droidRepository->save($model);
         });
     }
 }
