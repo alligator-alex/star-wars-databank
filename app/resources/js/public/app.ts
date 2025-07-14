@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function (): void {
 
         date.setTime(date.getTime() + 60 * 60 * 24 * 365 * 1000);
 
-        document.cookie = "cookie_consent=Y; path=/; expires=" + date.toUTCString();
+        document.cookie = "cookie_consent=Y; Path=/; Expires=" + date.toUTCString() + "; SameSite=Lax";
 
         cookieModal.remove();
     });

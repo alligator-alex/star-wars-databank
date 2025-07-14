@@ -12,14 +12,13 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cookie;
 
 /**
+ * @var bool $skipIntro
  * @var Collection<int, Vehicle> $vehicles
  * @var Collection<int, Droid> $droids
  * @var Collection<int, Faction> $factions
  * @var Collection<int, MediaType> $availableMediaTypes
  * @var Collection<int, Media> $media
  */
-
-$skipInto = (Cookie::get(CookieName::SKIP_INTRO->value) === 'Y');
 @endphp
 
 @extends('public.layouts.app')
@@ -28,7 +27,7 @@ $skipInto = (Cookie::get(CookieName::SKIP_INTRO->value) === 'Y');
 @section('page-wrapper-class', 'page-wrapper--home-page')
 
 @section('content')
-    @if (!$skipInto)
+    @if (!$skipIntro)
         <div class="intro js-intro">
             <p class="intro__title">A long time ago in a galaxy far,<br>far away....</p>
             <button type="button" class="intro__skip-button js-skip-intro">×</button>
