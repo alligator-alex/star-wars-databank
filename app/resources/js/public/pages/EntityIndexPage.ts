@@ -45,7 +45,6 @@ export default class EntityIndexPage {
         this.masonry = new Masonry(this.content);
 
         document.addEventListener("masonry.reload", (): void => {
-            this.masonry.destroy();
             this.masonry = new Masonry(this.content);
         });
     }
