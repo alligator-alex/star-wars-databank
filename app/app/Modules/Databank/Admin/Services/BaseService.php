@@ -19,6 +19,7 @@ abstract class BaseService
 {
     protected const int PER_PAGE = 20;
 
+    /** @var BaseRepository<TModel> */
     protected BaseRepository $repository;
 
     /**

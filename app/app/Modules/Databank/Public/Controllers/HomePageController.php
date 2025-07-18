@@ -15,8 +15,6 @@ use Illuminate\Support\Facades\Cookie;
 
 class HomePageController extends Controller
 {
-    private const int RANDOM_ENTITIES_COUNT = 15;
-
     public function __construct(
         private readonly FactionService $factionService,
         private readonly MediaService $mediaService,
@@ -32,13 +30,14 @@ class HomePageController extends Controller
                 name: CookieName::SKIP_INTRO->value,
                 value: 'Y',
                 minutes: 60 * 24 * 365,
-                httpOnly: false));
+                httpOnly: false
+            ));
         }
 
         return view('public.home', [
             'skipIntro' => (Cookie::get(CookieName::SKIP_INTRO->value) === 'Y'),
-            'vehicles' => $this->vehicleService->findRandom(self::RANDOM_ENTITIES_COUNT),
-            'droids' => $this->droidService->findRandom(self::RANDOM_ENTITIES_COUNT),
+            'vehicles' => $this->vehicleService->findRandom(),
+            'droids' => $this->droidService->findRandom(),
             'factions' => $this->factionService->findAll(),
             'availableMediaTypes' => $this->mediaService->availableTypes(),
             'media' => $this->mediaService->findAll(),

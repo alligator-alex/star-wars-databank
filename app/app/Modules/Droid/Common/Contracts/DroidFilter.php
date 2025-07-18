@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Droid\Common\Contracts;
 
-interface DroidFilter
+use App\Modules\Databank\Common\Contracts\Filterable;
+
+interface DroidFilter extends Filterable
 {
     /** @return string[] */
     public function getFactions(): array;

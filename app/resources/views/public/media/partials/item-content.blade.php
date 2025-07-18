@@ -1,5 +1,6 @@
 @php
 use App\Modules\Databank\Public\Enums\DatabankRouteName;
+use App\Modules\Databank\Public\Enums\ExploreRootType;
 use App\Modules\Databank\Public\Helpers\ViewHelper;
 use App\Modules\Droid\Public\Enums\DroidRouteName;
 use App\Modules\Media\Common\Models\Media;
@@ -12,7 +13,7 @@ use App\Modules\Vehicle\Public\Enums\VehicleRouteName;
 
 $routeParams = match ($routeName) {
     DatabankRouteName::EXPLORE => [
-        'type' => 'media',
+        'type' => ExploreRootType::MEDIA->value,
         'slug' => $media->slug,
     ],
     VehicleRouteName::INDEX, DroidRouteName::INDEX => [

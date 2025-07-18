@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Modules\Core\Admin\Enums\AdminRouteName;
+use App\Modules\Core\Admin\Enums\UserRouteName;
 use App\Modules\Droid\Admin\Enums\DroidRouteName;
 use App\Modules\Droid\Common\Repositories\DroidRepository;
 use App\Modules\Faction\Admin\Enums\FactionRouteName;
@@ -24,6 +26,20 @@ use Tabuna\Breadcrumbs\Trail;
 |--------------------------------------------------------------------------
 */
 
+// Home
+Breadcrumbs::for(
+    AdminRouteName::HOME->value,
+    static fn (Trail $trail) => $trail
+        ->push(__('Dashboard'), route(name: AdminRouteName::HOME, absolute: false))
+);
+
+// Profile
+Breadcrumbs::for(
+    UserRouteName::PROFILE->value,
+    static fn (Trail $trail) => $trail
+        ->push(__('Profile'), route(name: UserRouteName::PROFILE, absolute: false))
+);
+
 // Handbooks
 /** @var HandbookRepository $handbookRepository */
 $handbookRepository = app()->make(HandbookRepository::class);
@@ -33,8 +49,8 @@ $handbookValueRepository = app()->make(HandbookValueRepository::class);
 
 Breadcrumbs::for(
     HandbookValueRouteName::INDEX->value,
-    static fn (Trail $trail, int $handbookId): Trail =>
-    $trail->push(__('Handbooks'))
+    static fn (Trail $trail, int $handbookId): Trail => $trail
+        ->push(__('Handbooks'))
         ->push(
             $handbookRepository->findOneById($handbookId)?->name ?? __('Values'),
             route(HandbookValueRouteName::INDEX, ['handbookId' => $handbookId])
@@ -43,15 +59,15 @@ Breadcrumbs::for(
 
 Breadcrumbs::for(
     HandbookValueRouteName::CREATE->value,
-    static fn (Trail $trail, int $handbookId): Trail =>
-    $trail->parent(HandbookValueRouteName::INDEX->value, $handbookId)
+    static fn (Trail $trail, int $handbookId): Trail => $trail
+        ->parent(HandbookValueRouteName::INDEX->value, $handbookId)
         ->push(__('Create'))
 );
 
 Breadcrumbs::for(
     HandbookValueRouteName::EDIT->value,
-    static fn (Trail $trail, int $handbookId, int $handbookValueId): Trail =>
-    $trail->parent(HandbookValueRouteName::INDEX->value, $handbookId)
+    static fn (Trail $trail, int $handbookId, int $handbookValueId): Trail => $trail
+        ->parent(HandbookValueRouteName::INDEX->value, $handbookId)
         ->push(
             $handbookValueRepository->findOneById($handbookValueId)?->name,
             route(HandbookValueRouteName::EDIT->value, [
@@ -68,21 +84,21 @@ $factionRepository = app()->make(FactionRepository::class);
 
 Breadcrumbs::for(
     FactionRouteName::INDEX->value,
-    static fn (Trail $trail): Trail =>
-    $trail->push(__('Factions'), ManufacturerRouteName::INDEX->value)
+    static fn (Trail $trail): Trail => $trail
+        ->push(__('Factions'), ManufacturerRouteName::INDEX->value)
 );
 
 Breadcrumbs::for(
     FactionRouteName::CREATE->value,
-    static fn (Trail $trail): Trail =>
-    $trail->parent(FactionRouteName::INDEX->value)
+    static fn (Trail $trail): Trail => $trail
+        ->parent(FactionRouteName::INDEX->value)
         ->push(__('Create'))
 );
 
 Breadcrumbs::for(
     FactionRouteName::EDIT->value,
-    static fn (Trail $trail, int $id): Trail =>
-    $trail->parent(FactionRouteName::INDEX->value)
+    static fn (Trail $trail, int $id): Trail => $trail
+        ->parent(FactionRouteName::INDEX->value)
         ->push(
             $factionRepository->findOneById($id, true)?->name,
             route(FactionRouteName::EDIT->value, ['id' => $id], false)
@@ -96,21 +112,21 @@ $manufacturerRepository = app()->make(ManufacturerRepository::class);
 
 Breadcrumbs::for(
     ManufacturerRouteName::INDEX->value,
-    static fn (Trail $trail): Trail =>
-    $trail->push(__('Manufacturers'), ManufacturerRouteName::INDEX->value)
+    static fn (Trail $trail): Trail => $trail
+        ->push(__('Manufacturers'), ManufacturerRouteName::INDEX->value)
 );
 
 Breadcrumbs::for(
     ManufacturerRouteName::CREATE->value,
-    static fn (Trail $trail): Trail =>
-    $trail->parent(ManufacturerRouteName::INDEX->value)
+    static fn (Trail $trail): Trail => $trail
+        ->parent(ManufacturerRouteName::INDEX->value)
         ->push(__('Create'))
 );
 
 Breadcrumbs::for(
     ManufacturerRouteName::EDIT->value,
-    static fn (Trail $trail, int $id): Trail =>
-    $trail->parent(ManufacturerRouteName::INDEX->value)
+    static fn (Trail $trail, int $id): Trail => $trail
+        ->parent(ManufacturerRouteName::INDEX->value)
         ->push(
             $manufacturerRepository->findOneById($id, true)?->name,
             route(ManufacturerRouteName::EDIT->value, ['id' => $id], false)
@@ -124,21 +140,21 @@ $mediaRepository = app()->make(MediaRepository::class);
 
 Breadcrumbs::for(
     MediaRouteName::INDEX->value,
-    static fn (Trail $trail): Trail =>
-    $trail->push(__('Media'), MediaRouteName::INDEX->value)
+    static fn (Trail $trail): Trail => $trail
+        ->push(__('Media'), MediaRouteName::INDEX->value)
 );
 
 Breadcrumbs::for(
     MediaRouteName::CREATE->value,
-    static fn (Trail $trail): Trail =>
-    $trail->parent(MediaRouteName::INDEX->value)
+    static fn (Trail $trail): Trail => $trail
+        ->parent(MediaRouteName::INDEX->value)
         ->push(__('Create'))
 );
 
 Breadcrumbs::for(
     MediaRouteName::EDIT->value,
-    static fn (Trail $trail, int $id): Trail =>
-    $trail->parent(MediaRouteName::INDEX->value)
+    static fn (Trail $trail, int $id): Trail => $trail
+        ->parent(MediaRouteName::INDEX->value)
         ->push(
             $mediaRepository->findOneById($id, true)?->name,
             route(MediaRouteName::EDIT->value, ['id' => $id], false)
@@ -152,21 +168,21 @@ $vehicleRepository = app()->make(VehicleRepository::class);
 
 Breadcrumbs::for(
     VehicleRouteName::INDEX->value,
-    static fn (Trail $trail): Trail =>
-    $trail->push(__('Vehicles'), VehicleRouteName::INDEX->value)
+    static fn (Trail $trail): Trail => $trail
+        ->push(__('Vehicles'), VehicleRouteName::INDEX->value)
 );
 
 Breadcrumbs::for(
     VehicleRouteName::CREATE->value,
-    static fn (Trail $trail): Trail =>
-    $trail->parent(VehicleRouteName::INDEX->value)
+    static fn (Trail $trail): Trail => $trail
+        ->parent(VehicleRouteName::INDEX->value)
         ->push(__('Create'))
 );
 
 Breadcrumbs::for(
     VehicleRouteName::EDIT->value,
-    static fn (Trail $trail, int $id): Trail =>
-    $trail->parent(VehicleRouteName::INDEX->value)
+    static fn (Trail $trail, int $id): Trail => $trail
+        ->parent(VehicleRouteName::INDEX->value)
         ->push(
             $vehicleRepository->findOneById($id, true)?->name,
             route(VehicleRouteName::EDIT->value, ['id' => $id], false)
@@ -180,21 +196,21 @@ $droidRepository = app()->make(DroidRepository::class);
 
 Breadcrumbs::for(
     DroidRouteName::INDEX->value,
-    static fn (Trail $trail): Trail =>
-    $trail->push(__('Droids'), DroidRouteName::INDEX->value)
+    static fn (Trail $trail): Trail => $trail
+        ->push(__('Droids'), DroidRouteName::INDEX->value)
 );
 
 Breadcrumbs::for(
     DroidRouteName::CREATE->value,
-    static fn (Trail $trail): Trail =>
-    $trail->parent(DroidRouteName::INDEX->value)
+    static fn (Trail $trail): Trail => $trail
+        ->parent(DroidRouteName::INDEX->value)
         ->push(__('Create'))
 );
 
 Breadcrumbs::for(
     DroidRouteName::EDIT->value,
-    static fn (Trail $trail, int $id): Trail =>
-    $trail->parent(DroidRouteName::INDEX->value)
+    static fn (Trail $trail, int $id): Trail => $trail
+        ->parent(DroidRouteName::INDEX->value)
         ->push(
             $droidRepository->findOneById($id, true)?->name,
             route(DroidRouteName::EDIT->value, ['id' => $id], false)

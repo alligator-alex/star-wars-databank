@@ -46,6 +46,15 @@ services:
       - ./.database:/var/lib/postgresql/data
     restart: unless-stopped
 
+  redis:
+    image: redis:alpine
+    container_name: ${COMPOSE_PROJECT_NAME}-redis
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    volumes:
+      - ./.redis:/var/lib/redis
+    restart: unless-stopped
+
   imgproxy:
     image: darthsim/imgproxy:latest
     container_name: ${COMPOSE_PROJECT_NAME}-imgproxy

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Vehicle\Public\Services;
 
+use App\Modules\Core\Common\Helpers\CacheHelper;
 use App\Modules\Faction\Common\Models\Faction;
 use App\Modules\Handbook\Common\Models\HandbookValue;
 use App\Modules\Manufacturer\Common\Models\Manufacturer;
@@ -11,27 +12,19 @@ use App\Modules\Media\Common\Models\Media;
 use App\Modules\Vehicle\Common\Contracts\VehicleFilter;
 use App\Modules\Vehicle\Common\Models\Vehicle;
 use App\Modules\Vehicle\Common\Repositories\VehicleRepository;
+use App\Modules\Vehicle\Public\Enums\CacheKeyPrefix;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
-// TODO: cache
 class VehicleService
 {
     public const int PER_PAGE = 27;
+    private const int RANDOM_COUNT_DEFAULT = 15;
 
     public function __construct(private readonly VehicleRepository $repository)
     {
-    }
-
-    /**
-     * Get count of all models.
-     *
-     * @return int
-     */
-    public function count(): int
-    {
-        return $this->repository->queryBuilder()->count();
     }
 
     /**
@@ -70,12 +63,22 @@ class VehicleService
      * Find models with pagination and optional filter.
      *
      * @param VehicleFilter $filter
+     * @param int|null $page
      *
      * @return LengthAwarePaginator
      */
-    public function findPaginated(VehicleFilter $filter): LengthAwarePaginator
+    public function findPaginated(VehicleFilter $filter, ?int $page = 1): LengthAwarePaginator
     {
-        return $this->queryBuilder($filter)->paginate(static::PER_PAGE);
+        $cacheKey = CacheHelper::makePaginationKey(CacheKeyPrefix::PAGINATED, VehicleFilter::class, $filter, $page);
+        if (Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
+        }
+
+        $result = $this->queryBuilder($filter)->paginate(static::PER_PAGE);
+
+        Cache::put($cacheKey, $result);
+
+        return $result;
     }
 
     private function applyFilters(Builder $query, VehicleFilter $filter): void
@@ -123,13 +126,22 @@ class VehicleService
         }
     }
 
-    public function findRandom(int $count): Collection
+    public function findRandom(int $count = self::RANDOM_COUNT_DEFAULT): Collection
     {
-        return $this->queryBuilder()
+        $cacheKey = CacheHelper::makeKey(CacheKeyPrefix::RANDOM, (string) $count);
+        if (Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
+        }
+
+        $result = $this->queryBuilder()
             ->reorder()
             ->inRandomOrder()
             ->limit($count)
             ->get();
+
+        Cache::put($cacheKey, $result, 5 * 60);
+
+        return $result;
     }
 
     /**
@@ -142,14 +154,15 @@ class VehicleService
      */
     public function findOneBySlug(string $slug, bool $withDrafts = false): ?Vehicle
     {
+        $cacheKey = CacheHelper::makeKey(CacheKeyPrefix::ONE, $slug, ($withDrafts ? 'draft' : null));
+        if (Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
+        }
+
         /** @var Vehicle|null $model */
         $model = $this->repository->findOneBySlug($slug, $withDrafts);
 
-        if (!$model) {
-            return null;
-        }
-
-        $model->load([
+        $model?->load([
             'image',
             'category',
             'type',
@@ -159,6 +172,8 @@ class VehicleService
             'otherFactions',
             'appearances',
         ]);
+
+        Cache::put($cacheKey, $model, 24 * 60 * 60);
 
         return $model;
     }

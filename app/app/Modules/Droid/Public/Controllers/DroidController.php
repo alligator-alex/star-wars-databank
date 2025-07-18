@@ -5,26 +5,31 @@ declare(strict_types=1);
 namespace App\Modules\Droid\Public\Controllers;
 
 use App\Modules\Droid\Public\Services\DroidService;
-use App\Modules\Faction\Common\Models\Faction;
+use App\Modules\Faction\Public\Services\FactionService;
 use App\Modules\Handbook\Common\Enums\HandbookType;
-use App\Modules\Handbook\Common\Models\HandbookValue;
-use App\Modules\Manufacturer\Common\Models\Manufacturer;
-use App\Modules\Media\Common\Models\Media;
+use App\Modules\Handbook\Public\Services\HandbookValueService;
+use App\Modules\Manufacturer\Public\Services\ManufacturerService;
 use App\Modules\Droid\Admin\Enums\DroidRouteName;
 use App\Modules\Droid\Public\Requests\FilterRequest;
+use App\Modules\Media\Public\Services\MediaService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Request;
 
 class DroidController
 {
-    public function __construct(private readonly DroidService $service)
-    {
+    public function __construct(
+        private readonly DroidService $service,
+        private readonly MediaService $mediaService,
+        private readonly FactionService $factionService,
+        private readonly ManufacturerService $manufacturerService,
+        private readonly HandbookValueService $handbookValueService
+    ) {
     }
 
     public function index(FilterRequest $request): View|JsonResponse
     {
-        $droids = $this->service->findPaginated($request);
+        $droids = $this->service->findPaginated($request, (int) $request->page);
 
         /** @phpstan-ignore-next-line */
         $pagination = $droids->withQueryString()
@@ -55,12 +60,12 @@ class DroidController
             'appliedFilters' => $appliedFilters,
             'appliedFiltersCount' => count(array_filter($appliedFilters)),
             'droids' => $droids,
-            'factions' => Faction::dropdownList(columnAsKey: 'slug'),
-            'manufacturers' => Manufacturer::dropdownList(columnAsKey: 'slug'),
-            'media' => Media::dropdownList(columnAsKey: 'slug'),
-            'lines' => HandbookValue::dropdownList(HandbookType::DROID_LINE, 'slug'),
-            'models' => HandbookValue::dropdownList(HandbookType::DROID_MODEL, 'slug'),
-            'classes' => HandbookValue::dropdownList(HandbookType::DROID_CLASS, 'slug'),
+            'factions' => $this->factionService->dropdownList(),
+            'manufacturers' => $this->manufacturerService->dropdownList(),
+            'media' => $this->mediaService->dropdownList(),
+            'lines' => $this->handbookValueService->dropdownList(HandbookType::DROID_LINE),
+            'models' => $this->handbookValueService->dropdownList(HandbookType::DROID_MODEL),
+            'classes' => $this->handbookValueService->dropdownList(HandbookType::DROID_CLASS),
             'pagination' => $pagination,
         ]);
     }

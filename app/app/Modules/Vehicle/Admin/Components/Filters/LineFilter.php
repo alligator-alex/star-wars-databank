@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Modules\Vehicle\Admin\Components\Filters;
 
 use App\Modules\Handbook\Common\Enums\HandbookType;
-use App\Modules\Handbook\Common\Models\HandbookValue;
 use App\Modules\Handbook\Common\Rules\HandbookValueExists;
 use Illuminate\Database\Eloquent\Builder;
 use Orchid\Filters\Filter;
@@ -20,6 +19,14 @@ class LineFilter extends Filter
      * @var array<int, string>
      */
     public $parameters = ['linesIds'];
+
+    /**
+     * @param array<string, string> $dropdownList
+     */
+    public function __construct(private readonly array $dropdownList)
+    {
+        parent::__construct();
+    }
 
     /**
      * @return array<string, array<int, mixed>>
@@ -51,7 +58,7 @@ class LineFilter extends Filter
             Select::make('linesIds.')
                 ->title(__('Line'))
                 ->multiple()
-                ->options(HandbookValue::dropdownList(HandbookType::VEHICLE_LINE))
+                ->options($this->dropdownList)
                 ->value((array) $this->request->get('linesIds')),
         ];
     }

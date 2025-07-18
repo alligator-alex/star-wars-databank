@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Databank\Common\Providers;
 
+use App\Modules\Core\Admin\Enums\AdminRouteName;
 use App\Modules\Core\Common\Models\Attachment;
 use App\Modules\Core\Common\Models\User;
 use App\Modules\Databank\Import\Contracts\Importer;
@@ -70,8 +71,6 @@ class DatabankServiceProvider extends OrchidServiceProvider
         Dashboard::useModel(OrchidAttachment::class, Attachment::class);
 
         parent::boot($dashboard);
-
-        require base_path('routes/breadcrumbs/platform.php');
     }
 
     /**
@@ -123,6 +122,11 @@ class DatabankServiceProvider extends OrchidServiceProvider
             Menu::make(__('Media'))
                 ->icon('bs.camera-video')
                 ->route(MediaRouteName::INDEX->value)
+                ->divider(),
+
+            Menu::make(__('Settings'))
+                ->icon('bs.gear')
+                ->route(AdminRouteName::SETTINGS->value)
                 ->divider(),
 
             Menu::make(__('Wookieepedia home page'))

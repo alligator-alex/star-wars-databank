@@ -13,7 +13,7 @@ use Illuminate\Validation\Rule;
  * @property-read string $name
  * @property-read string $email
  */
-class Update extends AdminFormRequest implements UserData
+class UpdateRequest extends AdminFormRequest implements UserData
 {
     /**
      * @return array<string, array<int, mixed>>

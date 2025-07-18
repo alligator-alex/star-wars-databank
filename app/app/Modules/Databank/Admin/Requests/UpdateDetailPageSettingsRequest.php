@@ -12,7 +12,7 @@ use App\Modules\Databank\Common\Contracts\DetailPageSettingsData;
  * @property-read string|null $imageOffsetY
  * @property-read string|null $imageMaxHeight
  */
-class UpdateDetailPageSettings extends AdminFormRequest implements DetailPageSettingsData
+class UpdateDetailPageSettingsRequest extends AdminFormRequest implements DetailPageSettingsData
 {
     public function getImageOffsetX(): int
     {

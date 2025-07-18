@@ -34,8 +34,12 @@ RUN docker-php-ext-install \
     intl
 
 RUN apk add --no-cache $PHPIZE_DEPS \
-    && pecl install xdebug-3.4.0 \
-    && docker-php-ext-enable xdebug
+    && pecl install \
+      xdebug-3.4.0 \
+      redis \
+    && docker-php-ext-enable \
+      xdebug \
+      redis
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 

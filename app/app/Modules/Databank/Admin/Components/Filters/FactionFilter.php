@@ -20,6 +20,11 @@ class FactionFilter extends Filter
      */
     public $parameters = ['factionsIds'];
 
+    public function __construct(private readonly array $dropdownList)
+    {
+        parent::__construct();
+    }
+
     /**
      * @return array<string, array<int, mixed>>
      */
@@ -55,7 +60,7 @@ class FactionFilter extends Filter
         return [
             Select::make('factionsIds.')
                 ->title(__('Faction'))
-                ->options(Faction::dropdownList(true))
+                ->options($this->dropdownList)
                 ->value((array) $this->request->get('factionsIds'))
                 ->multiple(),
         ];

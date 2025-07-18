@@ -4,78 +4,88 @@ declare(strict_types=1);
 
 namespace App\Modules\Databank\Public\Services;
 
+use App\Modules\Core\Common\Helpers\CacheHelper;
+use App\Modules\Databank\Common\Contracts\Explorable;
+use App\Modules\Databank\Public\Enums\CacheKeyPrefix;
+use App\Modules\Databank\Public\Enums\ExploreRootType;
 use App\Modules\Droid\Public\Services\DroidService;
-use App\Modules\Faction\Common\Models\Faction;
-use App\Modules\Faction\Public\Services\FactionService;
-use App\Modules\Media\Common\Models\Media;
-use App\Modules\Media\Public\Services\MediaService;
+use App\Modules\Faction\Common\Repositories\FactionRepository;
+use App\Modules\Media\Common\Repositories\MediaRepository;
 use App\Modules\Vehicle\Public\Services\VehicleService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
-// TODO: cache
 class ExploreService
 {
     private const int ENTITIES_COUNT = 27;
-    private const int RANDOM_ENTITIES_COUNT = 15;
 
     public function __construct(
-        private readonly FactionService $factionService,
-        private readonly MediaService $mediaService,
+        private readonly FactionRepository $factionRepository,
+        private readonly MediaRepository $mediaRepository,
         private readonly VehicleService $vehicleService,
-        private readonly DroidService $droidService,
+        private readonly DroidService $droidService
     ) {
     }
 
-    public function findRootModel(string $type, string $slug): Faction|Media|null
+    public function findRootModel(ExploreRootType $type, string $slug): ?Explorable
     {
-        $service = match ($type) {
-            'faction' => $this->factionService,
-            'media' => $this->mediaService,
-            default => null,
-        };
-
-        if ($service === null) {
-            return null;
+        $cacheKey = CacheHelper::makeKey(CacheKeyPrefix::EXPLORE, $type->value, 'slug', $slug);
+        if (Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
         }
 
-        return $service->findOneBySlug($slug);
-    }
-
-    public function findRelatedModels(Faction|Media $root): Collection
-    {
-        $relationName = match ($root::class) {
-            Faction::class => 'factions',
-            Media::class => 'appearances',
-            default => null,
+        $repository = match ($type) {
+            ExploreRootType::FACTION => $this->factionRepository,
+            ExploreRootType::MEDIA => $this->mediaRepository,
         };
 
-        if ($relationName === null) {
-            return new Collection();
+        $model = $repository->findOneBySlug($slug);
+
+        Cache::put($cacheKey, $model, 30 * 60);
+
+        return $model;
+    }
+
+    public function findRelatedModels(Explorable $root): Collection
+    {
+        $type = match ($root->explorableType()) {
+            ExploreRootType::FACTION => 'faction',
+            ExploreRootType::MEDIA => 'media',
+        };
+
+        $relationName = match ($root->explorableType()) {
+            ExploreRootType::FACTION => 'factions',
+            ExploreRootType::MEDIA => 'appearances',
+        };
+
+        $cacheKey = CacheHelper::makeKey(CacheKeyPrefix::EXPLORE, $type, 'slug', $root->explorableKey(), 'related');
+        if (Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
         }
 
         $vehicles = $this->vehicleService->queryBuilder()
-            ->whereHas($relationName, fn (Builder $subQuery): Builder => $subQuery->where('slug', '=', $root->slug))
+            ->whereHas(
+                $relationName,
+                fn (Builder $subQuery): Builder => $subQuery->where('slug', '=', $root->explorableKey())
+            )
             ->inRandomOrder()
             ->limit((int) ceil(self::ENTITIES_COUNT / 2))
             ->get();
 
         $droids = $this->droidService->queryBuilder()
-            ->whereHas($relationName, fn (Builder $subQuery): Builder => $subQuery->where('slug', '=', $root->slug))
+            ->whereHas(
+                $relationName,
+                fn (Builder $subQuery): Builder => $subQuery->where('slug', '=', $root->explorableKey())
+            )
             ->inRandomOrder()
             ->limit(self::ENTITIES_COUNT - $vehicles->count())
             ->get();
 
-        return $vehicles->concat($droids->all())->shuffle();
-    }
+        $result = $vehicles->concat($droids->all())->shuffle();
 
-    public function findRandomVehicles(): Collection
-    {
-        return $this->vehicleService->findRandom(self::RANDOM_ENTITIES_COUNT);
-    }
+        Cache::put($cacheKey, $result, 30 * 60);
 
-    public function findRandomDroids(): Collection
-    {
-        return $this->droidService->findRandom(self::RANDOM_ENTITIES_COUNT);
+        return $result;
     }
 }

@@ -7,9 +7,10 @@ namespace App\Modules\Media\Public\Services;
 use App\Modules\Media\Common\Enums\MediaType;
 use App\Modules\Media\Common\Models\Media;
 use App\Modules\Media\Common\Repositories\MediaRepository;
+use App\Modules\Media\Public\Enums\CacheKeyPrefix;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
-// TODO: cache
 class MediaService
 {
     public function __construct(private readonly MediaRepository $repository)
@@ -21,11 +22,20 @@ class MediaService
      */
     public function availableTypes(): Collection
     {
-        return $this->repository->queryBuilder()
+        $cacheKey = CacheKeyPrefix::AVAILABLE_TYPES->value;
+        if (Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
+        }
+
+        $result =  $this->repository->queryBuilder()
             ->select('type')
             ->distinct()
             ->get()
             ->map(static fn (Media $media): MediaType => $media->type);
+
+        Cache::put($cacheKey, $result, 24 * 60 * 60);
+
+        return $result;
     }
 
     /**
@@ -35,20 +45,38 @@ class MediaService
      */
     public function findAll(): Collection
     {
-        return $this->repository->queryBuilder()
+        $cacheKey = CacheKeyPrefix::ALL->value;
+        if (Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
+        }
+
+        $result = $this->repository->queryBuilder()
             ->with(['poster'])
             ->orderBy('sort')
             ->orderBy('release_date')
             ->orderBy('name')
             ->orderByDesc('id')
             ->get();
+
+        Cache::put($cacheKey, $result, 24 * 60 * 60);
+
+        return $result;
     }
 
-    public function findOneBySlug(string $slug): ?Media
+    /**
+     * @return array<string, array<int, string>>
+     */
+    public function dropdownList(): array
     {
-        /** @var Media|null $model */
-        $model = $this->repository->findOneBySlug($slug);
+        $cacheKey = CacheKeyPrefix::DROPDOWN_LIST->value;
+        if (Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
+        }
 
-        return $model;
+        $result = $this->repository->dropdownList(columnAsKey: 'slug');
+
+        Cache::put($cacheKey, $result, 24 * 60 * 60);
+
+        return $result;
     }
 }

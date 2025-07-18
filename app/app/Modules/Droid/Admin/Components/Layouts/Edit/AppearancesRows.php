@@ -21,6 +21,13 @@ class AppearancesRows extends Rows
 
     protected $title = 'Appearances';
 
+    /**
+     * @param array<string, array<int, string>> $mediaDropdownList
+     */
+    public function __construct(private readonly array $mediaDropdownList)
+    {
+    }
+
     protected function fields(): iterable
     {
         return [
@@ -28,7 +35,7 @@ class AppearancesRows extends Rows
                 Select::make('appearancesIds.')
                     ->title(__('Appeared in'))
                     ->multiple()
-                    ->options(Media::dropdownList(true))
+                    ->options($this->mediaDropdownList)
                     ->value($this->selectedAppearancesIds()),
             ]),
         ];
@@ -42,6 +49,7 @@ class AppearancesRows extends Rows
         /** @var BelongsToMany|Media $query */
         $query = $this->model()->appearances();
 
+        /** @phpstan-ignore-next-line */
         $query->withDrafts();
 
         return $query->pluck(Media::tableName() . '.id')->toArray();

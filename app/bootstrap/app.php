@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 use App\Modules\Core\Common\Helpers\ConsoleCommandsHelper;
 use App\Modules\Databank\Common\Enums\CookieName;
-use App\Modules\Sitemap\Console\Commands\BuildSitemap;
-use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        health: '/up',
+        web: [
+            __DIR__ . '/../routes/web.php',
+            __DIR__ . '/../routes/breadcrumbs/platform.php',
+        ],
+        commands: __DIR__ . '/../routes/console.php',
     )
     ->withCommands(ConsoleCommandsHelper::getPathsInsideModules())
     ->withMiddleware(function (Middleware $middleware) {
@@ -22,10 +22,5 @@ return Application::configure(basePath: dirname(__DIR__))
             CookieName::COOKIE_CONSENT->value,
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions) {
-        //
-    })
-    ->withSchedule(function (Schedule $schedule) {
-        $schedule->call(BuildSitemap::class)->dailyAt('0:00');
-    })
+    ->withExceptions()
     ->create();

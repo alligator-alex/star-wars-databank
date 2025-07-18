@@ -6,15 +6,21 @@ namespace App\Modules\Media\Admin\Services;
 
 use App\Modules\Core\Admin\Exceptions\AdminServiceException;
 use App\Modules\Databank\Admin\Services\BaseService;
+use App\Modules\Databank\Common\Repositories\BaseRepository;
 use App\Modules\Media\Common\Contracts\MediaData;
 use App\Modules\Media\Common\Models\Media;
 use App\Modules\Media\Common\Repositories\MediaRepository;
+use App\Modules\Media\Public\Enums\CacheKeyPrefix;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * @extends BaseService<Media>
  */
 class MediaService extends BaseService
 {
+    /** @var MediaRepository */
+    protected BaseRepository $repository;
+
     public function __construct(MediaRepository $repository)
     {
         $this->repository = $repository;
@@ -85,6 +91,23 @@ class MediaService extends BaseService
             throw new AdminServiceException('Unable to save');
         }
 
+        $this->forgetCache();
+
         return $model;
+    }
+
+    /**
+     * @return array<string, array<int, string>>
+     */
+    public function dropdownList(): array
+    {
+        return $this->repository->dropdownList(true);
+    }
+
+    private function forgetCache(): void
+    {
+        Cache::forget(CacheKeyPrefix::ALL->value);
+        Cache::forget(CacheKeyPrefix::AVAILABLE_TYPES->value);
+        Cache::forget(CacheKeyPrefix::DROPDOWN_LIST->value);
     }
 }

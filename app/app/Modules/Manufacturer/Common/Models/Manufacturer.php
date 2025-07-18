@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Modules\Manufacturer\Common\Models;
 
 use App\Modules\Core\Common\Components\Model;
-use App\Modules\Core\Common\Traits\AsDropdownList;
 use App\Modules\Core\Common\Traits\Publishable;
 use App\Modules\Databank\Common\Enums\Status;
 use App\Modules\Manufacturer\Common\Factories\ManufacturerFactory;
@@ -47,7 +46,6 @@ use Orchid\Screen\AsSource;
  */
 class Manufacturer extends Model
 {
-    use AsDropdownList;
     use AsSource;
     use Filterable;
     use Publishable;

@@ -1,6 +1,6 @@
 @php
-use App\Modules\Databank\Common\Enums\CookieName;
 use App\Modules\Databank\Public\Enums\DatabankRouteName;
+use App\Modules\Databank\Public\Enums\ExploreRootType;
 use App\Modules\Droid\Common\Models\Droid;
 use App\Modules\Droid\Public\Enums\DroidRouteName;
 use App\Modules\Faction\Common\Models\Faction;
@@ -9,7 +9,6 @@ use App\Modules\Media\Common\Models\Media;
 use App\Modules\Vehicle\Common\Models\Vehicle;
 use App\Modules\Vehicle\Public\Enums\VehicleRouteName;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cookie;
 
 /**
  * @var bool $skipIntro
@@ -86,7 +85,7 @@ use Illuminate\Support\Facades\Cookie;
         <div class="factions-selector wow fadeIn" data-wow-delay="500ms">
             @foreach ($factions as $i => $faction)
                 <a href="{{ route(DatabankRouteName::EXPLORE, [
-                    'type' => 'faction',
+                    'type' => ExploreRootType::FACTION,
                     'slug' => $faction->slug,
                 ], false) }}" class="factions-selector__item wow fadeInUp" data-wow-delay="{{ (($i + 1) * 100) }}ms">
                     <div class="factions-selector__emblem faction-emblem faction-emblem--{{ $faction->slug }}">

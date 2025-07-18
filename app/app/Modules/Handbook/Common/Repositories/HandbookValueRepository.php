@@ -34,4 +34,42 @@ class HandbookValueRepository extends ModelRepository
             ->whereHas('handbook', static fn (Builder $subQuery): Builder => $subQuery->where('type', '=', $type->value))
             ->count();
     }
+
+    /**
+     * @param HandbookType $type
+     * @param string $columnAsKey
+     *
+     * @return array<string, string>
+     */
+    public function dropdownList(HandbookType $type, string $columnAsKey = 'id'): array
+    {
+        static $listCache = [];
+
+        if (!isset($listCache[$type->value])) {
+            $listCache[$type->value] = [];
+
+            $query = $this->queryBuilder()
+                ->whereHas('handbook', static fn (Builder $subQuery) => $subQuery->where('type', '=', $type->value))
+                ->orderBy('name')
+                ->orderByDesc('id');
+
+            /** @var HandbookValue $item */
+            foreach ($query->get() as $item) {
+                $listCache[$type->value][$item->{$columnAsKey}] = $item->name;
+            }
+
+            // move "Other" to the end
+            if ($type === HandbookType::VEHICLE_TYPE) {
+                $otherKey = array_search('Other', $listCache[$type->value], true);
+
+                if ($otherKey) {
+                    $otherItem = $listCache[$type->value][$otherKey];
+                    unset($listCache[$type->value][$otherKey]);
+                    $listCache[$type->value][$otherKey] = $otherItem;
+                }
+            }
+        }
+
+        return $listCache[$type->value];
+    }
 }

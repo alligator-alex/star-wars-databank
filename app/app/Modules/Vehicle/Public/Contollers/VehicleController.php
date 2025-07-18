@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Modules\Vehicle\Public\Contollers;
 
-use App\Modules\Faction\Common\Models\Faction;
+use App\Modules\Faction\Public\Services\FactionService;
 use App\Modules\Handbook\Common\Enums\HandbookType;
-use App\Modules\Handbook\Common\Models\HandbookValue;
-use App\Modules\Manufacturer\Common\Models\Manufacturer;
-use App\Modules\Media\Common\Models\Media;
+use App\Modules\Handbook\Public\Services\HandbookValueService;
+use App\Modules\Manufacturer\Public\Services\ManufacturerService;
+use App\Modules\Media\Public\Services\MediaService;
 use App\Modules\Vehicle\Admin\Enums\VehicleRouteName;
 use App\Modules\Vehicle\Public\Requests\FilterRequest;
 use App\Modules\Vehicle\Public\Services\VehicleService;
@@ -18,13 +18,18 @@ use Illuminate\Support\Facades\Request;
 
 class VehicleController
 {
-    public function __construct(private readonly VehicleService $service)
-    {
+    public function __construct(
+        private readonly VehicleService $service,
+        private readonly MediaService $mediaService,
+        private readonly FactionService $factionService,
+        private readonly ManufacturerService $manufacturerService,
+        private readonly HandbookValueService $handbookValueService
+    ) {
     }
 
     public function index(FilterRequest $request): View|JsonResponse
     {
-        $vehicles = $this->service->findPaginated($request);
+        $vehicles = $this->service->findPaginated($request, (int) $request->page);
 
         /** @phpstan-ignore-next-line */
         $pagination = $vehicles->withQueryString()
@@ -55,12 +60,12 @@ class VehicleController
             'appliedFilters' => $appliedFilters,
             'appliedFiltersCount' => count(array_filter($appliedFilters)),
             'vehicles' => $vehicles,
-            'factions' => Faction::dropdownList(columnAsKey: 'slug'),
-            'manufacturers' => Manufacturer::dropdownList(columnAsKey: 'slug'),
-            'media' => Media::dropdownList(columnAsKey: 'slug'),
-            'categories' => HandbookValue::dropdownList(HandbookType::VEHICLE_CATEGORY, 'slug'),
-            'types' => HandbookValue::dropdownList(HandbookType::VEHICLE_TYPE, 'slug'),
-            'lines' => HandbookValue::dropdownList(HandbookType::VEHICLE_LINE, 'slug'),
+            'factions' => $this->factionService->dropdownList(),
+            'manufacturers' => $this->manufacturerService->dropdownList(),
+            'media' => $this->mediaService->dropdownList(),
+            'categories' => $this->handbookValueService->dropdownList(HandbookType::VEHICLE_CATEGORY),
+            'types' => $this->handbookValueService->dropdownList(HandbookType::VEHICLE_TYPE),
+            'lines' => $this->handbookValueService->dropdownList(HandbookType::VEHICLE_LINE),
             'pagination' => $pagination,
         ]);
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Modules\Databank\Public;
 
 use App\Modules\Databank\Public\Enums\DatabankRouteName;
+use App\Modules\Databank\Public\Enums\ExploreRootType;
 use App\Modules\Faction\Common\Models\Faction;
 use App\Modules\Media\Common\Models\Media;
 use Closure;
@@ -45,7 +46,7 @@ class ExplorePageTest extends TestCase
                     ]);
 
                     return [
-                        'type' => 'faction',
+                        'type' => ExploreRootType::FACTION->value,
                         'slug' => $faction->slug,
                         'name' => $faction->name,
                     ];
@@ -58,7 +59,7 @@ class ExplorePageTest extends TestCase
                     ]);
 
                     return [
-                        'type' => 'media',
+                        'type' => ExploreRootType::MEDIA->value,
                         'slug' => $media->slug,
                         'name' => $media->name,
                     ];

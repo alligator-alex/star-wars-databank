@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace App\Modules\Faction\Common\Models;
 
 use App\Modules\Core\Common\Components\Model;
-use App\Modules\Core\Common\Traits\AsDropdownList;
 use App\Modules\Core\Common\Traits\Publishable;
+use App\Modules\Databank\Common\Contracts\Explorable;
 use App\Modules\Databank\Common\Enums\Status;
+use App\Modules\Databank\Public\Enums\ExploreRootType;
 use App\Modules\Faction\Common\Factories\FactionFactory;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Builder;
@@ -46,9 +47,8 @@ use Orchid\Screen\AsSource;
  * @method static Builder<static>|Faction whereUpdatedAt($value)
  * @method static Builder<static>|Faction withUniqueSlugConstraints(Model $model, string $attribute, array $config, string $slug)
  */
-class Faction extends Model
+class Faction extends Model implements Explorable
 {
-    use AsDropdownList;
     use AsSource;
     use Filterable;
     use Publishable;
@@ -95,5 +95,15 @@ class Faction extends Model
             $this->name,
             false
         );
+    }
+
+    public function explorableKey(): string
+    {
+        return $this->slug;
+    }
+
+    public function explorableType(): ExploreRootType
+    {
+        return ExploreRootType::FACTION;
     }
 }

@@ -44,7 +44,7 @@ abstract class BaseRepository extends PublishableModelRepository
      * @param string $slug
      * @param bool $withDrafts
      *
-     * @return Model|null
+     * @return TModel|null
      */
     public function findOneBySlug(string $slug, bool $withDrafts = false): ?Model
     {

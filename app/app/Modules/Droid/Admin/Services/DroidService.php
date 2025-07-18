@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace App\Modules\Droid\Admin\Services;
 
 use App\Modules\Core\Admin\Exceptions\AdminServiceException;
+use App\Modules\Core\Common\Helpers\CacheHelper;
 use App\Modules\Databank\Admin\Services\BaseService;
 use App\Modules\Databank\Admin\Traits\ServiceWithPageSettings;
+use App\Modules\Databank\Public\Enums\CacheKeyPrefix as DatabankCacheKeyPrefix;
 use App\Modules\Droid\Common\Contracts\DroidData;
 use App\Modules\Droid\Common\Models\Droid;
 use App\Modules\Droid\Common\Repositories\DroidRepository;
+use App\Modules\Droid\Public\Enums\CacheKeyPrefix;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * @extends BaseService<Droid>
@@ -100,6 +104,38 @@ class DroidService extends BaseService
 
         $model->factions()->sync($factionsSyncData);
 
+        $this->forgetCache($model);
+
         return $model;
+    }
+
+    public function delete(int $id): Droid
+    {
+        $model = parent::delete($id);
+
+        $this->forgetCache($model);
+
+        return $model;
+    }
+
+    public function togglePublish(int $id): Droid
+    {
+        $model = parent::togglePublish($id);
+
+        $this->forgetCache($model);
+
+        return $model;
+    }
+
+    private function forgetCache(Droid $model): void
+    {
+        Cache::forget(CacheHelper::makeKey(CacheKeyPrefix::ONE, $model->slug));
+        Cache::forget(CacheHelper::makeKey(CacheKeyPrefix::ONE, $model->slug, 'draft'));
+
+        Cache::forget(CacheKeyPrefix::PAGINATED->value);
+        CacheHelper::forgetByWildcard(CacheKeyPrefix::PAGINATED);
+        CacheHelper::forgetByWildcard(CacheKeyPrefix::RANDOM);
+
+        CacheHelper::forgetByWildcard(DatabankCacheKeyPrefix::EXPLORE);
     }
 }

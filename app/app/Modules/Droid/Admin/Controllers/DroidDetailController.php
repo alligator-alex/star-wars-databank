@@ -8,8 +8,8 @@ use App\Modules\Core\Admin\Exceptions\AdminServiceException;
 use App\Modules\Databank\Admin\Components\Fields\DetailPageSettings;
 use App\Modules\Databank\Admin\Components\Fields\IndexPageSettings;
 use App\Modules\Databank\Admin\Controllers\BaseDetailController;
-use App\Modules\Databank\Admin\Requests\UpdateDetailPageSettings;
-use App\Modules\Databank\Admin\Requests\UpdateIndexPageSettings;
+use App\Modules\Databank\Admin\Requests\UpdateDetailPageSettingsRequest;
+use App\Modules\Databank\Admin\Requests\UpdateIndexPageSettingsRequest;
 use App\Modules\Databank\Common\Enums\Status;
 use App\Modules\Droid\Admin\Components\Layouts\Edit\AppearancesRows;
 use App\Modules\Droid\Admin\Components\Layouts\Edit\InfoRows;
@@ -21,6 +21,11 @@ use App\Modules\Droid\Admin\Requests\StoreRequest;
 use App\Modules\Droid\Admin\Requests\UpdateRequest;
 use App\Modules\Droid\Admin\Services\DroidService;
 use App\Modules\Droid\Common\Models\Droid;
+use App\Modules\Faction\Admin\Services\FactionService;
+use App\Modules\Handbook\Admin\Services\HandbookValueService;
+use App\Modules\Handbook\Common\Enums\HandbookType;
+use App\Modules\Manufacturer\Admin\Services\ManufacturerService;
+use App\Modules\Media\Admin\Services\MediaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Orchid\Screen\Actions\ModalToggle;
@@ -35,8 +40,13 @@ use Orchid\Support\Facades\Toast;
  */
 class DroidDetailController extends BaseDetailController
 {
-    public function __construct(private readonly DroidService $service)
-    {
+    public function __construct(
+        private readonly DroidService $service,
+        private readonly ManufacturerService $manufacturerService,
+        private readonly FactionService $factionService,
+        private readonly MediaService $mediaService,
+        private readonly HandbookValueService $handbookValueService
+    ) {
     }
 
     /**
@@ -88,9 +98,15 @@ class DroidDetailController extends BaseDetailController
     {
         $rows = [
             MainRows::class,
-            InfoRows::class,
+            new InfoRows(
+                $this->handbookValueService->dropdownList(HandbookType::DROID_LINE),
+                $this->handbookValueService->dropdownList(HandbookType::DROID_MODEL),
+                $this->handbookValueService->dropdownList(HandbookType::DROID_CLASS),
+                $this->manufacturerService->dropdownList(),
+                $this->factionService->dropdownList()
+            ),
             TechSpecsRows::class,
-            AppearancesRows::class,
+            new AppearancesRows($this->mediaService->dropdownList()),
         ];
 
         if ($this->model?->exists) {
@@ -181,7 +197,7 @@ class DroidDetailController extends BaseDetailController
         return redirect()->route(DroidRouteName::INDEX, $request->query());
     }
 
-    public function updateIndexPageSettings(int $id, UpdateIndexPageSettings $request): RedirectResponse
+    public function updateIndexPageSettings(int $id, UpdateIndexPageSettingsRequest $request): RedirectResponse
     {
         try {
             $this->service->updateIndexPageSettings($id, $request);
@@ -193,7 +209,7 @@ class DroidDetailController extends BaseDetailController
         return redirect()->route(DroidRouteName::EDIT, ['id' => $id]);
     }
 
-    public function updateDetailPageSettings(int $id, UpdateDetailPageSettings $request): RedirectResponse
+    public function updateDetailPageSettings(int $id, UpdateDetailPageSettingsRequest $request): RedirectResponse
     {
         try {
             $this->service->updateDetailPageSettings($id, $request);

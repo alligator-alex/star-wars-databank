@@ -16,7 +16,7 @@ use App\Modules\Databank\Common\Contracts\IndexPageSettingsData;
  * @property-read string|null $imageOffsetX
  * @property-read string|null $imageOffsetY
  */
-class UpdateIndexPageSettings extends AdminFormRequest implements IndexPageSettingsData
+class UpdateIndexPageSettingsRequest extends AdminFormRequest implements IndexPageSettingsData
 {
     public function isCardLarge(): bool
     {

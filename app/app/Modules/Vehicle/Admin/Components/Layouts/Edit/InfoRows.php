@@ -8,8 +8,6 @@ use App\Modules\Core\Admin\Components\Fields\Select;
 use App\Modules\Core\Admin\Traits\LayoutWithModel;
 use App\Modules\Databank\Common\Enums\AttachmentGroup;
 use App\Modules\Faction\Common\Models\Faction;
-use App\Modules\Handbook\Common\Enums\HandbookType;
-use App\Modules\Handbook\Common\Models\HandbookValue;
 use App\Modules\Manufacturer\Common\Models\Manufacturer;
 use App\Modules\Vehicle\Common\Models\Vehicle;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -28,27 +26,43 @@ class InfoRows extends Rows
 
     protected $title = 'Info';
 
+    /**
+     * @param array<string, string> $categoryDropdownList
+     * @param array<string, string> $typeDropdownList
+     * @param array<string, string> $lineDropdownList
+     * @param array<string, string> $manufacturerDropdownList
+     * @param array<string, string> $factionDropdownList
+     */
+    public function __construct(
+        private readonly array $categoryDropdownList,
+        private readonly array $typeDropdownList,
+        private readonly array $lineDropdownList,
+        private readonly array $manufacturerDropdownList,
+        private readonly array $factionDropdownList
+    ) {
+    }
+
     protected function fields(): iterable
     {
         return [
             Group::make([
                 Select::make('categoryId')
                     ->title(__('Category'))
-                    ->options(HandbookValue::dropdownList(HandbookType::VEHICLE_CATEGORY))
+                    ->options($this->categoryDropdownList)
                     ->empty(__('None'))
                     ->set('placeholder', __('Select...'))
                     ->value($this->model()->category_id),
 
                 Select::make('typeId')
                     ->title(__('Type'))
-                    ->options(HandbookValue::dropdownList(HandbookType::VEHICLE_TYPE))
+                    ->options($this->typeDropdownList)
                     ->empty(__('None'))
                     ->set('placeholder', __('Select...'))
                     ->value($this->model()->type_id),
 
                 Select::make('lineId')
                     ->title(__('Line'))
-                    ->options(HandbookValue::dropdownList(HandbookType::VEHICLE_LINE))
+                    ->options($this->lineDropdownList)
                     ->empty(__('None'))
                     ->set('placeholder', __('Select...'))
                     ->value($this->model()->line_id),
@@ -57,19 +71,19 @@ class InfoRows extends Rows
             Group::make([
                 Select::make('manufacturersIds.')
                     ->title(__('Manufactured by'))
-                    ->options(Manufacturer::dropdownList(true))
+                    ->options($this->manufacturerDropdownList)
                     ->value($this->selectedManufacturersIds())
                     ->multiple(),
 
                 Select::make('factionsIds.')
                     ->title(__('Used by'))
-                    ->options(Faction::dropdownList(true))
+                    ->options($this->factionDropdownList)
                     ->value($this->selectedFactionsIds())
                     ->multiple(),
 
                 Select::make('mainFactionId')
                     ->title(__('Mainly used by'))
-                    ->options(Faction::dropdownList(true))
+                    ->options($this->factionDropdownList)
                     ->empty(__('None'))
                     ->set('placeholder', __('Select...'))
                     ->value($this->selectedMainFactionId()),

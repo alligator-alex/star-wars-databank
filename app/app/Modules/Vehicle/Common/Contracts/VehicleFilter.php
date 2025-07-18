@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Vehicle\Common\Contracts;
 
-interface VehicleFilter
+use App\Modules\Databank\Common\Contracts\Filterable;
+
+interface VehicleFilter extends Filterable
 {
     /** @return string[] */
     public function getFactions(): array;

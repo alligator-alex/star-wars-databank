@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-use App\Modules\Core\Admin\Controllers\User\ProfileScreen;
+use App\Modules\Core\Admin\Controllers\User\ProfileController;
 use App\Modules\Core\Admin\Enums\AdminRouteName;
 use App\Modules\Core\Admin\Enums\UserRouteName;
 use App\Modules\Databank\Admin\Controllers\HomePageController;
+use App\Modules\Databank\Admin\Controllers\SettingsPageController;
 use App\Modules\Droid\Admin\Controllers\DroidDetailController;
 use App\Modules\Droid\Admin\Controllers\DroidIndexController;
 use App\Modules\Droid\Admin\Enums\DroidRouteName;
@@ -25,7 +26,6 @@ use App\Modules\Vehicle\Admin\Controllers\VehicleDetailController;
 use App\Modules\Vehicle\Admin\Controllers\VehicleIndexController;
 use App\Modules\Vehicle\Admin\Enums\VehicleRouteName;
 use Illuminate\Support\Facades\Route;
-use Tabuna\Breadcrumbs\Trail;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,27 +38,30 @@ use Tabuna\Breadcrumbs\Trail;
 |
 */
 
-// Main
-Route::screen('/dashboard', HomePageController::class)
-    ->name(AdminRouteName::HOME)
-    ->breadcrumbs(
-        fn (Trail $trail) => $trail
-        ->push(__('Dashboard'), route(name: AdminRouteName::HOME, absolute: false))
-    );
+// Home
+Route::prefix('/dashboard')->group(static function () {
+    Route::get('/', HomePageController::class)
+        ->name(AdminRouteName::HOME);
+});
+
+// Settings
+Route::prefix('/settings')->group(static function () {
+    Route::get('/', SettingsPageController::class)
+        ->name(AdminRouteName::SETTINGS);
+
+    Route::post('/clear-cache', [SettingsPageController::class, 'clearCache'])
+        ->name(AdminRouteName::CLEAR_CACHE);
+});
 
 // Profile
 Route::prefix('/profile')->group(static function () {
-    Route::get('/', ProfileScreen::class)
-        ->name(UserRouteName::PROFILE)
-        ->breadcrumbs(
-            static fn (Trail $trail) => $trail
-            ->push(__('Profile'), route(name: UserRouteName::PROFILE, absolute: false))
-        );
+    Route::get('/', ProfileController::class)
+        ->name(UserRouteName::PROFILE);
 
-    Route::post('/', [ProfileScreen::class, 'update'])
+    Route::post('/', [ProfileController::class, 'update'])
         ->name(UserRouteName::UPDATE);
 
-    Route::post('/change-password', [ProfileScreen::class, 'changePassword'])
+    Route::post('/change-password', [ProfileController::class, 'changePassword'])
         ->name(UserRouteName::CHANGE_PASSWORD);
 });
 

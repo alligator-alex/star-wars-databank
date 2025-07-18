@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Sitemap\Common\Providers;
 
 use App\Modules\Databank\Public\Enums\DatabankRouteName;
+use App\Modules\Databank\Public\Enums\ExploreRootType;
 use App\Modules\Faction\Common\Models\Faction;
 use App\Modules\Faction\Common\Repositories\FactionRepository;
 use App\Modules\Media\Common\Models\Media;
@@ -37,7 +38,7 @@ class StaticProvider extends SitemapProvider
             ->each(static function (Faction $faction) use (&$items): void {
                 $items[] = new SitemapItem(
                     route(DatabankRouteName::EXPLORE, [
-                        'type' => 'faction',
+                        'type' => ExploreRootType::FACTION->value,
                         'slug' => $faction->slug,
                     ]),
                     Carbon::now(),
@@ -51,7 +52,7 @@ class StaticProvider extends SitemapProvider
             ->each(static function (Media $media) use (&$items): void {
                 $items[] = new SitemapItem(
                     route(DatabankRouteName::EXPLORE, [
-                        'type' => 'media',
+                        'type' => ExploreRootType::MEDIA->value,
                         'slug' => $media->slug,
                     ]),
                     Carbon::now(),

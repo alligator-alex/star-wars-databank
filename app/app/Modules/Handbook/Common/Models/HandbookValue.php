@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Handbook\Common\Models;
 
 use App\Modules\Core\Common\Components\Model;
-use App\Modules\Handbook\Common\Enums\HandbookType;
 use App\Modules\Handbook\Common\Factories\HandbookValueFactory;
-use App\Modules\Handbook\Common\Repositories\HandbookValueRepository;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -76,46 +74,5 @@ class HandbookValue extends Model
     public function handbook(): BelongsTo
     {
         return $this->belongsTo(Handbook::class, 'handbook_id', 'id');
-    }
-
-    /**
-     * @param HandbookType $type
-     * @param string $columnAsKey
-     *
-     * @return array<string, string>
-     */
-    public static function dropdownList(HandbookType $type, string $columnAsKey = 'id'): array
-    {
-        static $listCache = [];
-
-        if (!isset($listCache[$type->value])) {
-            $listCache[$type->value] = [];
-
-            /** @var HandbookValueRepository $repository */
-            $repository = app()->make(HandbookValueRepository::class);
-
-            $query = $repository->queryBuilder()
-                ->whereHas('handbook', static fn (Builder $subQuery) => $subQuery->where('type', '=', $type->value))
-                ->orderBy('name')
-                ->orderByDesc('id');
-
-            /** @var static $item */
-            foreach ($query->get() as $item) {
-                $listCache[$type->value][$item->{$columnAsKey}] = $item->name;
-            }
-
-            // move "Other" to the end
-            if ($type === HandbookType::VEHICLE_TYPE) {
-                $otherKey = array_search('Other', $listCache[$type->value], true);
-
-                if ($otherKey) {
-                    $otherItem = $listCache[$type->value][$otherKey];
-                    unset($listCache[$type->value][$otherKey]);
-                    $listCache[$type->value][$otherKey] = $otherItem;
-                }
-            }
-        }
-
-        return $listCache[$type->value];
     }
 }

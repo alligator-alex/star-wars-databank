@@ -7,8 +7,10 @@ namespace App\Modules\Media\Common\Models;
 use App\Modules\Core\Common\Components\Model;
 use App\Modules\Core\Common\Models\Attachment;
 use App\Modules\Core\Common\Traits\Publishable;
+use App\Modules\Databank\Common\Contracts\Explorable;
 use App\Modules\Databank\Common\Enums\AttachmentGroup;
 use App\Modules\Databank\Common\Enums\Status;
+use App\Modules\Databank\Public\Enums\ExploreRootType;
 use App\Modules\Media\Common\Enums\MediaType;
 use App\Modules\Media\Common\Factories\MediaFactory;
 use Cviebrock\EloquentSluggable\Sluggable;
@@ -57,7 +59,7 @@ use Orchid\Screen\AsSource;
  * @method static Builder<static>|Media whereUpdatedAt($value)
  * @method static Builder<static>|Media withUniqueSlugConstraints(Model $model, string $attribute, array $config, string $slug)
  */
-class Media extends Model
+class Media extends Model implements Explorable
 {
     use AsSource;
     use Attachable;
@@ -124,58 +126,13 @@ class Media extends Model
         return $this->name . ' (' . $this->releaseYear() . ')';
     }
 
-    /**
-     * @param bool $withDrafts
-     * @param string $columnAsKey
-     *
-     * @return array<string, array<int, string>>
-     */
-    public static function dropdownList(bool $withDrafts = false, string $columnAsKey = 'id'): array
+    public function explorableKey(): string
     {
-        static $list = null;
+        return $this->slug;
+    }
 
-        if ($list === null) {
-            $otherKey = __('Other');
-
-            $list = [
-                MediaType::MOVIE->nameForHumans() => [],
-                MediaType::SERIES->nameForHumans() => [],
-                MediaType::GAME->nameForHumans() => [],
-                $otherKey => [],
-            ];
-
-            /** @var Builder|static $query */
-            $query = static::query();
-
-            if ($withDrafts) {
-                $query->withDrafts();
-            }
-
-            $query->orderBy('sort')->orderBy('release_date')->orderBy('name')->orderByDesc('id');
-
-            /** @var static $item */
-            foreach ($query->get() as $item) {
-                $value = $item->name;
-
-                if ($item->release_date) {
-                    $value .= ' (' . $item->release_date->format('Y') . ')';
-                }
-
-                if (!$item->type) {
-                    $list[$otherKey][$item->{$columnAsKey}] = $value;
-                    continue;
-                }
-
-                $list[$item->type->nameForHumans()][$item->{$columnAsKey}] = $value;
-            }
-
-            foreach ($list as $type => $names) {
-                if (empty($names)) {
-                    unset($list[$type]);
-                }
-            }
-        }
-
-        return (array) $list;
+    public function explorableType(): ExploreRootType
+    {
+        return ExploreRootType::MEDIA;
     }
 }

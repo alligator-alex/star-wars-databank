@@ -8,8 +8,8 @@ use App\Modules\Core\Admin\Components\User\Layouts\Profile\PasswordRows;
 use App\Modules\Core\Admin\Components\User\Layouts\Profile\MainRows;
 use App\Modules\Core\Admin\Enums\UserRouteName;
 use App\Modules\Core\Admin\Exceptions\AdminServiceException;
-use App\Modules\Core\Admin\Requests\User\ChangePassword;
-use App\Modules\Core\Admin\Requests\User\Update;
+use App\Modules\Core\Admin\Requests\User\ChangePasswordRequest;
+use App\Modules\Core\Admin\Requests\User\UpdateRequest;
 use App\Modules\Core\Admin\Services\UserService;
 use App\Modules\Core\Common\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -21,7 +21,7 @@ use Orchid\Support\Facades\Alert;
 use Orchid\Support\Facades\Layout;
 use Orchid\Support\Facades\Toast;
 
-class ProfileScreen extends Screen
+class ProfileController extends Screen
 {
     public function __construct(private readonly UserService $service)
     {
@@ -85,7 +85,7 @@ class ProfileScreen extends Screen
         ];
     }
 
-    public function update(Update $request): RedirectResponse
+    public function update(UpdateRequest $request): RedirectResponse
     {
         try {
             $model = $this->service->update($request->user()->id, $request);
@@ -98,7 +98,7 @@ class ProfileScreen extends Screen
         return redirect()->refresh();
     }
 
-    public function changePassword(ChangePassword $request): RedirectResponse
+    public function changePassword(ChangePasswordRequest $request): RedirectResponse
     {
         try {
             $this->service->changePassword($request->user()->id, $request->newPassword);

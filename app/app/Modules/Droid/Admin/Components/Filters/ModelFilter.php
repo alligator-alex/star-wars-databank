@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Modules\Droid\Admin\Components\Filters;
 
 use App\Modules\Handbook\Common\Enums\HandbookType;
-use App\Modules\Handbook\Common\Models\HandbookValue;
 use App\Modules\Handbook\Common\Rules\HandbookValueExists;
 use Illuminate\Database\Eloquent\Builder;
 use Orchid\Filters\Filter;
@@ -20,6 +19,14 @@ class ModelFilter extends Filter
      * @var array<int, string>
      */
     public $parameters = ['modelsIds'];
+
+    /**
+     * @param array<string, string> $dropdownList
+     */
+    public function __construct(private readonly array $dropdownList)
+    {
+        parent::__construct();
+    }
 
     /**
      * @return array<string, array<int, mixed>>
@@ -51,7 +58,7 @@ class ModelFilter extends Filter
             Select::make('modelsIs.')
                 ->title(__('Model'))
                 ->multiple()
-                ->options(HandbookValue::dropdownList(HandbookType::DROID_MODEL))
+                ->options($this->dropdownList)
                 ->value((array) $this->request->get('modelsIds')),
         ];
     }

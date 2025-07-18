@@ -21,6 +21,14 @@ class ManufacturerFilter extends Filter
     public $parameters = ['manufacturersIds'];
 
     /**
+     * @param array<string, string> $dropdownList
+     */
+    public function __construct(private readonly array $dropdownList)
+    {
+        parent::__construct();
+    }
+
+    /**
      * @return array<string, array<int, mixed>>
      */
     public function rules(): array
@@ -55,7 +63,7 @@ class ManufacturerFilter extends Filter
         return [
             Select::make('manufacturersIds.')
                 ->title(__('Manufacturer'))
-                ->options(Manufacturer::dropdownList(true))
+                ->options($this->dropdownList)
                 ->value((array) $this->request->get('manufacturersIds'))
                 ->multiple(),
         ];

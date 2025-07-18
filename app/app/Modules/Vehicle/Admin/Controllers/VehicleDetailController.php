@@ -8,9 +8,14 @@ use App\Modules\Core\Admin\Exceptions\AdminServiceException;
 use App\Modules\Databank\Admin\Components\Fields\DetailPageSettings;
 use App\Modules\Databank\Admin\Components\Fields\IndexPageSettings;
 use App\Modules\Databank\Admin\Controllers\BaseDetailController;
-use App\Modules\Databank\Admin\Requests\UpdateDetailPageSettings;
-use App\Modules\Databank\Admin\Requests\UpdateIndexPageSettings;
+use App\Modules\Databank\Admin\Requests\UpdateDetailPageSettingsRequest;
+use App\Modules\Databank\Admin\Requests\UpdateIndexPageSettingsRequest;
 use App\Modules\Databank\Common\Enums\Status;
+use App\Modules\Faction\Admin\Services\FactionService;
+use App\Modules\Handbook\Admin\Services\HandbookValueService;
+use App\Modules\Handbook\Common\Enums\HandbookType;
+use App\Modules\Manufacturer\Admin\Services\ManufacturerService;
+use App\Modules\Media\Admin\Services\MediaService;
 use App\Modules\Vehicle\Admin\Components\Layouts\Edit\AppearancesRows;
 use App\Modules\Vehicle\Admin\Components\Layouts\Edit\InfoRows;
 use App\Modules\Vehicle\Admin\Components\Layouts\Edit\MainRows;
@@ -35,8 +40,13 @@ use Orchid\Support\Facades\Toast;
  */
 class VehicleDetailController extends BaseDetailController
 {
-    public function __construct(private readonly VehicleService $service)
-    {
+    public function __construct(
+        private readonly VehicleService $service,
+        private readonly ManufacturerService $manufacturerService,
+        private readonly FactionService $factionService,
+        private readonly MediaService $mediaService,
+        private readonly HandbookValueService $handbookValueService
+    ) {
     }
 
     /**
@@ -88,9 +98,15 @@ class VehicleDetailController extends BaseDetailController
     {
         $rows = [
             MainRows::class,
-            InfoRows::class,
+            new InfoRows(
+                $this->handbookValueService->dropdownList(HandbookType::VEHICLE_CATEGORY),
+                $this->handbookValueService->dropdownList(HandbookType::VEHICLE_TYPE),
+                $this->handbookValueService->dropdownList(HandbookType::VEHICLE_LINE),
+                $this->manufacturerService->dropdownList(),
+                $this->factionService->dropdownList()
+            ),
             TechSpecsRows::class,
-            AppearancesRows::class,
+            new AppearancesRows($this->mediaService->dropdownList()),
         ];
 
         if ($this->model?->exists) {
@@ -182,7 +198,7 @@ class VehicleDetailController extends BaseDetailController
         return redirect()->route(VehicleRouteName::INDEX, $request->query());
     }
 
-    public function updateIndexPageSettings(int $id, UpdateIndexPageSettings $request): RedirectResponse
+    public function updateIndexPageSettings(int $id, UpdateIndexPageSettingsRequest $request): RedirectResponse
     {
         try {
             $this->service->updateIndexPageSettings($id, $request);
@@ -194,7 +210,7 @@ class VehicleDetailController extends BaseDetailController
         return redirect()->route(VehicleRouteName::EDIT, ['id' => $id]);
     }
 
-    public function updateDetailPageSettings(int $id, UpdateDetailPageSettings $request): RedirectResponse
+    public function updateDetailPageSettings(int $id, UpdateDetailPageSettingsRequest $request): RedirectResponse
     {
         try {
             $this->service->updateDetailPageSettings($id, $request);

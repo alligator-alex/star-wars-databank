@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\Modules\Handbook\Admin\Services;
 
 use App\Modules\Core\Admin\Exceptions\AdminServiceException;
+use App\Modules\Core\Common\Helpers\CacheHelper;
 use App\Modules\Handbook\Common\Contracts\HandbookValueData;
+use App\Modules\Handbook\Common\Enums\HandbookType;
 use App\Modules\Handbook\Common\Models\HandbookValue;
 use App\Modules\Handbook\Common\Repositories\HandbookValueRepository;
+use App\Modules\Handbook\Public\Enums\CacheKeyPrefix;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Orchid\Screen\Layouts\Selection;
@@ -110,6 +113,8 @@ class HandbookValueService
             throw new AdminServiceException('Unable to save');
         }
 
+        $this->forgetCache();
+
         return $model;
     }
 
@@ -126,6 +131,8 @@ class HandbookValueService
 
         $model->exists = false;
 
+        $this->forgetCache();
+
         return $model;
     }
 
@@ -135,5 +142,15 @@ class HandbookValueService
     public function newModel(): HandbookValue
     {
         return $this->repository->newModel();
+    }
+
+    public function dropdownList(HandbookType $type): array
+    {
+        return $this->repository->dropdownList($type);
+    }
+
+    private function forgetCache(): void
+    {
+        CacheHelper::forgetByWildcard(CacheKeyPrefix::DROPDOWN_LIST);
     }
 }

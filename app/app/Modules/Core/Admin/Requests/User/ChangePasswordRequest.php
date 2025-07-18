@@ -9,7 +9,7 @@ use App\Modules\Core\Admin\Requests\AdminFormRequest;
 /**
  * @property-read string $newPassword
  */
-class ChangePassword extends AdminFormRequest
+class ChangePasswordRequest extends AdminFormRequest
 {
     /**
      * @return array<string, array<int, mixed>>

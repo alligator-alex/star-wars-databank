@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Vehicle\Admin\Controllers;
 
+use App\Modules\Faction\Admin\Services\FactionService;
+use App\Modules\Handbook\Admin\Services\HandbookValueService;
+use App\Modules\Manufacturer\Admin\Services\ManufacturerService;
 use App\Modules\Vehicle\Admin\Components\Layouts\Index\FilterLayout;
 use App\Modules\Vehicle\Admin\Components\Layouts\Index\IndexLayout;
 use App\Modules\Vehicle\Admin\Enums\VehicleRouteName;
@@ -16,8 +19,12 @@ use Orchid\Support\Color;
 
 class VehicleIndexController extends Screen
 {
-    public function __construct(private readonly VehicleService $service)
-    {
+    public function __construct(
+        private readonly VehicleService $service,
+        private readonly ManufacturerService $manufacturerService,
+        private readonly FactionService $factionService,
+        private readonly HandbookValueService $handbookValueService
+    ) {
     }
 
     public function name(): string
@@ -54,7 +61,7 @@ class VehicleIndexController extends Screen
     public function layout(): iterable
     {
         return [
-            new FilterLayout(),
+            new FilterLayout($this->manufacturerService, $this->factionService, $this->handbookValueService),
             new IndexLayout(),
         ];
     }
