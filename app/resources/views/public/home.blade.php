@@ -23,6 +23,7 @@ use Illuminate\Support\Collection;
 @extends('public.layouts.app')
 
 @section('title', config('app.name'))
+@section('description', __('Discover the most iconic Star Wars vehicles and droids from across the galaxy — explore legendary starships, speeders, and robotic companions from the beloved franchise.'))
 @section('page-wrapper-class', 'page-wrapper--home-page')
 
 @section('content')

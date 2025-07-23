@@ -1,5 +1,4 @@
 @php
-use App\Modules\Core\Public\Components\Breadcrumbs;
 use App\Modules\Databank\Common\DTOs\PageSettings\DetailPagePageSettings;
 use App\Modules\Databank\Public\Helpers\ViewHelper;
 use App\Modules\Droid\Common\Models\Droid;
@@ -11,9 +10,6 @@ use Illuminate\Support\Str;
  */
 
 $settings = $droid->getPageSettings()->getForDetail();
-
-Breadcrumbs::add(__('Droids'), DroidRouteName::INDEX->value);
-Breadcrumbs::add($droid->name, DroidRouteName::DETAIL->value, $droid->slug);
 @endphp
 
 @extends('public.layouts.app')

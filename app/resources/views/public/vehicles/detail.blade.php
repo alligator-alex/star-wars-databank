@@ -1,5 +1,4 @@
 @php
-use App\Modules\Core\Public\Components\Breadcrumbs;
 use App\Modules\Databank\Common\DTOs\PageSettings\DetailPagePageSettings;
 use App\Modules\Databank\Public\Helpers\ViewHelper;
 use App\Modules\Vehicle\Common\Models\Vehicle;
@@ -11,9 +10,6 @@ use Illuminate\Support\Str;
  */
 
 $settings = $vehicle->getPageSettings()->getForDetail();
-
-Breadcrumbs::add(__('Vehicles'), VehicleRouteName::INDEX->value);
-Breadcrumbs::add($vehicle->name, VehicleRouteName::DETAIL->value, $vehicle->slug);
 @endphp
 
 @extends('public.layouts.app')

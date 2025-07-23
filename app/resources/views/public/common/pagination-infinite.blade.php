@@ -7,7 +7,8 @@
 @if ($paginator->hasPages() && $paginator->hasMorePages())
     <nav class="pagination pagination--infinite"
         data-current-page="{{ $paginator->currentPage() }}">
-        <a rel="next"
+        <a href="{{ $paginator->nextPageUrl() }}"
+           rel="next"
            aria-label="{{ __('Next') }}"
            data-page-num="{{ $paginator->currentPage() + 1 }}"
            class="button button--yellow wow fadeInUp"

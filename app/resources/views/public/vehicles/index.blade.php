@@ -1,8 +1,6 @@
 @php
-use App\Modules\Core\Public\Components\Breadcrumbs;
 use App\Modules\Handbook\Common\Models\HandbookValue;
 use App\Modules\Vehicle\Common\Models\Vehicle;
-use App\Modules\Vehicle\Public\Enums\VehicleRouteName;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Collection;
 
@@ -18,13 +16,12 @@ use Illuminate\Support\Collection;
  * @var HandbookValue[] $types
  * @var Htmlable $pagination
  */
-
-Breadcrumbs::add(__('Vehicles'), VehicleRouteName::INDEX->value);
 @endphp
 
 @extends('public.layouts.app')
 
 @section('title', __('Vehicles') . ' — ' . config('app.name'))
+@section('description', __('Explore iconic Star Wars vehicles — from X-wings and Millennium Falcon to AT-ATs and speeders. Discover specs, history, and roles of legendary starships and ground transports.'))
 @section('page-wrapper-class', 'vehicle-index-page')
 
 @section('content')

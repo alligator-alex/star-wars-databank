@@ -11,6 +11,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: [
             __DIR__ . '/../routes/web.php',
+            __DIR__ . '/../routes/breadcrumbs/web.php',
             __DIR__ . '/../routes/breadcrumbs/platform.php',
         ],
         commands: __DIR__ . '/../routes/console.php',

@@ -1,9 +1,9 @@
 @php
-use App\Modules\Core\Public\Components\Breadcrumbs;
 use App\Modules\Databank\Common\Enums\CookieName;
 use App\Modules\Databank\Public\Enums\DatabankRouteName;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\URL;
 
 $cookieConsent = (Cookie::get(CookieName::COOKIE_CONSENT->value) === 'Y');
 @endphp
@@ -16,6 +16,10 @@ $cookieConsent = (Cookie::get(CookieName::COOKIE_CONSENT->value) === 'Y');
 
     <title>@yield('title')</title>
     <meta name="description" content="@yield('description')">
+
+    @if (!empty(Request::query()))
+        <link rel="canonical" href="{{ URL::current() }}">
+    @endif
 
     @vite(['resources/scss/app.scss'])
 
@@ -36,7 +40,7 @@ $cookieConsent = (Cookie::get(CookieName::COOKIE_CONSENT->value) === 'Y');
 <div class="page-wrapper @yield('page-wrapper-class')">
     <main class="page-content">
         @if (!isset($exception) && (Request::route()?->getName() !== DatabankRouteName::HOME->value))
-            {!! Breadcrumbs::render() !!}
+            @include('public.common.breadcrumbs')
         @endif
         @yield('content')
 

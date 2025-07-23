@@ -1,6 +1,4 @@
 @php
-use App\Modules\Core\Public\Components\Breadcrumbs;
-use App\Modules\Databank\Public\Enums\DatabankRouteName;
 use App\Modules\Droid\Common\Models\Droid;
 use App\Modules\Droid\Public\Enums\DroidRouteName;
 use App\Modules\Faction\Common\Models\Faction;
@@ -8,6 +6,7 @@ use App\Modules\Media\Common\Models\Media;
 use App\Modules\Vehicle\Common\Models\Vehicle;
 use App\Modules\Vehicle\Public\Enums\VehicleRouteName;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 /**
  * @var string $type
@@ -32,15 +31,17 @@ $routeParams = match ($root::class) {
         'media[]' => $root->slug,
     ],
 };
-
-Breadcrumbs::add(__('Explore'), DatabankRouteName::HOME->value);
-Breadcrumbs::add(__(class_basename($root)), DatabankRouteName::EXPLORE->value, ['type' => $type, 'slug' => $root->slug]);
-Breadcrumbs::add($root->name, DatabankRouteName::EXPLORE->value, ['type' => $type, 'slug' => $root->slug]);
 @endphp
 
 @extends('public.layouts.app')
 
 @section('title', __('Explore') . ' ' . $titleSuffix . ' ' . $root->name . ' — ' . config('app.name'))
+
+@if ($root instanceof Faction)
+    @section('description', 'Dive into the ' . $root->name . ' — one of the major powers in the Star Wars galaxy. Explore their vehicles and droids in the galactic conflict.')
+@elseif ($root instanceof Media)
+    @section('description', 'Explore the Star Wars universe through ' . $root->name . '. Discover vehicles and droids from this iconic ' . Str::singular(mb_lcfirst($root->type->nameForHumans())) . '.')
+@endif
 
 @section('content')
     <section class="container">

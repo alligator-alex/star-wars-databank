@@ -21,7 +21,7 @@ Route::prefix('/vehicles')->group(function () {
     Route::get('/', [VehicleController::class, 'index'])
         ->name(VehicleRouteName::INDEX);
 
-    Route::get('/{slug}/', [VehicleController::class, 'detail'])
+    Route::get('/{slug}', [VehicleController::class, 'detail'])
         ->name(VehicleRouteName::DETAIL);
 });
 
@@ -29,6 +29,6 @@ Route::prefix('/droids')->group(function () {
     Route::get('/', [DroidController::class, 'index'])
         ->name(DroidRouteName::INDEX);
 
-    Route::get('/{slug}/', [DroidController::class, 'detail'])
+    Route::get('/{slug}', [DroidController::class, 'detail'])
         ->name(DroidRouteName::DETAIL);
 });

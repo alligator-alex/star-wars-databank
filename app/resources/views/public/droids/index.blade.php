@@ -1,7 +1,5 @@
 @php
-use App\Modules\Core\Public\Components\Breadcrumbs;
 use App\Modules\Droid\Common\Models\Droid;
-use App\Modules\Droid\Public\Enums\DroidRouteName;
 use App\Modules\Handbook\Common\Models\HandbookValue;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Collection;
@@ -18,13 +16,12 @@ use Illuminate\Support\Collection;
  * @var HandbookValue[] $classes
  * @var Htmlable $pagination
  */
-
-Breadcrumbs::add(__('Droids'), DroidRouteName::INDEX->value);
 @endphp
 
 @extends('public.layouts.app')
 
 @section('title', __('Droids') . ' — ' . config('app.name'))
+@section('description', __('Meet the most famous Star Wars droids — R2-D2, C-3PO, BB-8, and more. Learn about their functions, personalities, and key moments across the galaxy far, far away.'))
 @section('page-wrapper-class', 'droid-index-page')
 
 @section('content')
