@@ -7,35 +7,26 @@ namespace App\Modules\Databank\Admin\Requests;
 use App\Modules\Core\Admin\Requests\AdminFormRequest;
 use App\Modules\Databank\Common\Contracts\IndexPageSettingsData;
 
-/**
- * @property-read bool|null $cardLarge
- * @property-read bool|null $imageCovered
- * @property-read bool|null $imageScaled
- * @property-read string|null $imageScale
- * @property-read bool|null $imageOffsetted
- * @property-read string|null $imageOffsetX
- * @property-read string|null $imageOffsetY
- */
 class UpdateIndexPageSettingsRequest extends AdminFormRequest implements IndexPageSettingsData
 {
     public function isCardLarge(): bool
     {
-        return (bool) $this->cardLarge;
+        return $this->boolean('cardLarge');
     }
 
     public function isImageCovered(): bool
     {
-        return (bool) $this->imageCovered;
+        return $this->boolean('imageCovered');
     }
 
     public function isImageScaled(): bool
     {
-        return (bool) $this->imageScaled;
+        return $this->boolean('imageScaled');
     }
 
     public function getImageScale(): float
     {
-        $value = (float) $this->imageScale;
+        $value = $this->float('imageScale');
 
         if ($value < 0.2) {
             return 0.2;
@@ -50,12 +41,12 @@ class UpdateIndexPageSettingsRequest extends AdminFormRequest implements IndexPa
 
     public function isImageOffsetted(): bool
     {
-        return (bool) $this->imageOffsetted;
+        return $this->boolean('imageOffsetted');
     }
 
     public function getImageOffsetX(): int
     {
-        $value = (int) $this->imageOffsetX;
+        $value = $this->integer('imageOffsetX');
 
         if ($value < -500) {
             return -500;
@@ -70,7 +61,7 @@ class UpdateIndexPageSettingsRequest extends AdminFormRequest implements IndexPa
 
     public function getImageOffsetY(): int
     {
-        $value = (int) $this->imageOffsetY;
+        $value = $this->integer('imageOffsetY');
 
         if ($value < -500) {
             return -500;

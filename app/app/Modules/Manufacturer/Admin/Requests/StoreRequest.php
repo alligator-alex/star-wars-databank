@@ -11,12 +11,6 @@ use App\Modules\Manufacturer\Common\Models\Manufacturer;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Unique;
 
-/**
- * @property-read string $name
- * @property-read string|null $slug
- * @property-read string $status
- * @property-read string|null $sort
- */
 class StoreRequest extends AdminFormRequest implements ManufacturerData
 {
     /**
@@ -34,21 +28,21 @@ class StoreRequest extends AdminFormRequest implements ManufacturerData
 
     public function getName(): string
     {
-        return $this->name;
+        return $this->input('name');
     }
 
     public function getSlug(): ?string
     {
-        return $this->slug;
+        return $this->input('slug');
     }
 
     public function getStatus(): Status
     {
-        return Status::tryFrom((int) $this->status);
+        return $this->enum('status', Status::class);
     }
 
     public function getSort(): ?int
     {
-        return isset($this->sort) ? (int) $this->sort : null;
+        return $this->filled('sort') ? $this->integer('sort') : null;
     }
 }

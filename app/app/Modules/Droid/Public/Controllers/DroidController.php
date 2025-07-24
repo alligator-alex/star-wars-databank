@@ -29,7 +29,7 @@ class DroidController
 
     public function index(FilterRequest $request): View|JsonResponse
     {
-        $droids = $this->service->findPaginated($request, (int) $request->page);
+        $droids = $this->service->findPaginated($request, $request->getPage());
 
         /** @phpstan-ignore-next-line */
         $pagination = $droids->withQueryString()

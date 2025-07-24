@@ -6,9 +6,6 @@ namespace App\Modules\Databank\Public\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-/**
- * @property-read string|null $page
- */
 abstract class BaseIndexRequest extends FormRequest
 {
     /**
@@ -28,6 +25,6 @@ abstract class BaseIndexRequest extends FormRequest
 
     public function getPage(): int
     {
-        return (int) $this->page;
+        return $this->integer('page', 1);
     }
 }

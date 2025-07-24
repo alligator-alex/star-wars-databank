@@ -15,15 +15,6 @@ use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
 
-/**
- * @property-read string $name
- * @property-read string|null $slug
- * @property-read string $status
- * @property-read string|null $sort
- * @property-read string $type
- * @property-read string $releaseDate
- * @property-read string $posterId
- */
 class StoreRequest extends AdminFormRequest implements MediaData
 {
     /**
@@ -45,36 +36,36 @@ class StoreRequest extends AdminFormRequest implements MediaData
 
     public function getName(): string
     {
-        return $this->name;
+        return $this->input('name');
     }
 
     public function getSlug(): ?string
     {
-        return $this->slug;
+        return $this->input('slug');
     }
 
     public function getStatus(): Status
     {
-        return Status::tryFrom((int) $this->status);
+        return $this->enum('status', Status::class);
     }
 
     public function getSort(): ?int
     {
-        return isset($this->sort) ? (int) $this->sort : null;
+        return $this->filled('sort') ? $this->integer('sort') : null;
     }
 
     public function getType(): ?MediaType
     {
-        return MediaType::tryFrom((int) $this->type);
+        return $this->enum('type', MediaType::class);
     }
 
     public function getReleaseDate(): ?Carbon
     {
-        return Carbon::createFromFormat('Y-m-d', $this->releaseDate);
+        return $this->date('releaseDate', 'Y-m-d');
     }
 
     public function getPosterId(): int
     {
-        return (int) $this->posterId;
+        return $this->integer('posterId');
     }
 }

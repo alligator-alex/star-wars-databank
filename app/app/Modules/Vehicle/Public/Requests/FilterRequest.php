@@ -13,14 +13,6 @@ use App\Modules\Media\Common\Models\Media;
 use App\Modules\Vehicle\Common\Contracts\VehicleFilter;
 use Illuminate\Validation\Rules\Exists;
 
-/**
- * @property-read string[]|null $factions
- * @property-read string[]|null $manufacturers
- * @property-read string[]|null $media
- * @property-read string[]|null $categories
- * @property-read string[]|null $types
- * @property-read string[]|null $lines
- */
 class FilterRequest extends BaseIndexRequest implements VehicleFilter
 {
     protected function getRules(): array
@@ -48,31 +40,31 @@ class FilterRequest extends BaseIndexRequest implements VehicleFilter
 
     public function getFactions(): array
     {
-        return (array) $this->factions;
+        return $this->array('factions');
     }
 
     public function getManufacturers(): array
     {
-        return (array) $this->manufacturers;
+        return $this->array('manufacturers');
     }
 
     public function getMedia(): array
     {
-        return (array) $this->media;
+        return $this->array('media');
     }
 
     public function getCategories(): array
     {
-        return (array) $this->categories;
+        return $this->array('categories');
     }
 
     public function getTypes(): array
     {
-        return (array) $this->types;
+        return $this->array('types');
     }
 
     public function getLines(): array
     {
-        return (array) $this->lines;
+        return $this->array('lines');
     }
 }

@@ -29,7 +29,7 @@ class VehicleController
 
     public function index(FilterRequest $request): View|JsonResponse
     {
-        $vehicles = $this->service->findPaginated($request, (int) $request->page);
+        $vehicles = $this->service->findPaginated($request, $request->getPage());
 
         /** @phpstan-ignore-next-line */
         $pagination = $vehicles->withQueryString()

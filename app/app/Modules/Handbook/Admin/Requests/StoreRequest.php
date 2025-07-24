@@ -9,10 +9,6 @@ use App\Modules\Handbook\Common\Contracts\HandbookValueData;
 use App\Modules\Handbook\Common\Models\HandbookValue;
 use Illuminate\Validation\Rules\Unique;
 
-/**
- * @property-read string $name
- * @property-read string|null $slug
- */
 class StoreRequest extends AdminFormRequest implements HandbookValueData
 {
     /**
@@ -33,11 +29,11 @@ class StoreRequest extends AdminFormRequest implements HandbookValueData
 
     public function getName(): string
     {
-        return $this->name;
+        return $this->input('name');
     }
 
     public function getSlug(): ?string
     {
-        return $this->slug;
+        return $this->input('slug');
     }
 }

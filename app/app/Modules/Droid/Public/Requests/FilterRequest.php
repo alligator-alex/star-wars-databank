@@ -13,14 +13,6 @@ use App\Modules\Manufacturer\Common\Models\Manufacturer;
 use App\Modules\Media\Common\Models\Media;
 use Illuminate\Validation\Rules\Exists;
 
-/**
- * @property-read string[]|null $factions
- * @property-read string[]|null $manufacturers
- * @property-read string[]|null $media
- * @property-read string[]|null $lines
- * @property-read string[]|null $models
- * @property-read string[]|null $classes
- */
 class FilterRequest extends BaseIndexRequest implements DroidFilter
 {
     protected function getRules(): array
@@ -48,31 +40,31 @@ class FilterRequest extends BaseIndexRequest implements DroidFilter
 
     public function getFactions(): array
     {
-        return (array) $this->factions;
+        return $this->array('factions');
     }
 
     public function getManufacturers(): array
     {
-        return (array) $this->manufacturers;
+        return $this->array('manufacturers');
     }
 
     public function getMedia(): array
     {
-        return (array) $this->media;
+        return $this->array('media');
     }
 
     public function getLines(): array
     {
-        return (array) $this->lines;
+        return $this->array('lines');
     }
 
     public function getModels(): array
     {
-        return (array) $this->models;
+        return $this->array('models');
     }
 
     public function getClasses(): array
     {
-        return (array) $this->classes;
+        return $this->array('classes');
     }
 }

@@ -7,16 +7,11 @@ namespace App\Modules\Databank\Admin\Requests;
 use App\Modules\Core\Admin\Requests\AdminFormRequest;
 use App\Modules\Databank\Common\Contracts\DetailPageSettingsData;
 
-/**
- * @property-read string|null $imageOffsetX
- * @property-read string|null $imageOffsetY
- * @property-read string|null $imageMaxHeight
- */
 class UpdateDetailPageSettingsRequest extends AdminFormRequest implements DetailPageSettingsData
 {
     public function getImageOffsetX(): int
     {
-        $value = (int) $this->imageOffsetX;
+        $value = $this->input('imageOffsetX');
 
         if ($value < 0) {
             return 0;
@@ -31,7 +26,7 @@ class UpdateDetailPageSettingsRequest extends AdminFormRequest implements Detail
 
     public function getImageOffsetY(): int
     {
-        $value = (int) $this->imageOffsetY;
+        $value = $this->integer('imageOffsetY');
 
         if ($value < 0) {
             return 0;
@@ -46,7 +41,7 @@ class UpdateDetailPageSettingsRequest extends AdminFormRequest implements Detail
 
     public function getImageMaxHeight(): int
     {
-        $value = (int) $this->imageMaxHeight;
+        $value = $this->integer('imageMaxHeight');
 
         if ($value < 1) {
             return 1;

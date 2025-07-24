@@ -23,23 +23,6 @@ use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
 
-/**
- * @property-read string $name
- * @property-read string|null $slug
- * @property-read string $status
- * @property-read string|null $sort
- * @property-read string $externalUrl
- * @property-read string|null $categoryId
- * @property-read string|null $typeId
- * @property-read string|null $lineId
- * @property-read string[]|null $manufacturersIds
- * @property-read string[]|null $factionsIds
- * @property-read string|null $mainFactionId
- * @property-read string $imageId
- * @property-read string $description
- * @property-read array|null $techSpecs
- * @property-read string[] $appearancesIds
- */
 class StoreRequest extends AdminFormRequest implements VehicleData
 {
     /**
@@ -77,80 +60,80 @@ class StoreRequest extends AdminFormRequest implements VehicleData
 
     public function getName(): string
     {
-        return $this->name;
+        return $this->input('name');
     }
 
     public function getSlug(): ?string
     {
-        return $this->slug;
+        return $this->input('slug');
     }
 
     public function getStatus(): Status
     {
-        return Status::tryFrom((int) $this->status);
+        return $this->enum('status', Status::class);
     }
 
     public function getSort(): ?int
     {
-        return isset($this->sort) ? (int) $this->sort : null;
+        return $this->filled('sort') ? $this->integer('sort') : null;
     }
 
     public function getExternalUrl(): ?string
     {
-        return $this->externalUrl;
+        return $this->input('externalUrl');
     }
 
     public function getCategoryId(): ?int
     {
-        return (int) $this->categoryId ?: null;
+        return $this->filled('categoryId') ? $this->integer('categoryId') : null;
     }
 
     public function getTypeId(): ?int
     {
-        return (int) $this->typeId ?: null;
+        return $this->filled('typeId') ? $this->integer('typeId') : null;
     }
 
     public function getLineId(): ?int
     {
-        return (int) $this->lineId ?: null;
+        return $this->filled('lineId') ? $this->integer('lineId') : null;
     }
 
     public function getManufacturersIds(): array
     {
-        if (!$this->manufacturersIds) {
+        if ($this->isNotFilled('manufacturersIds')) {
             return [];
         }
 
-        return Arr::map($this->manufacturersIds, static fn (string $id): int => (int) $id);
+        return Arr::map($this->array('manufacturersIds'), static fn (string $id): int => (int) $id);
     }
 
     public function getFactionsIds(): array
     {
-        if (!$this->factionsIds) {
+        if ($this->isNotFilled('factionsIds')) {
             return [];
         }
 
-        return Arr::map($this->factionsIds, static fn (string $id): int => (int) $id);
+        return Arr::map($this->array('factionsIds'), static fn (string $id): int => (int) $id);
     }
 
     public function getMainFactionId(): ?int
     {
-        return (int) $this->mainFactionId ?: null;
+        return $this->filled('mainFactionId') ? $this->integer('mainFactionId') : null;
     }
 
     public function getImageId(): ?int
     {
-        return (int) $this->imageId;
+        return $this->filled('imageId') ? $this->integer('imageId') : null;
     }
 
     public function getDescription(): ?string
     {
-        return $this->description;
+        return $this->input('description');
     }
 
     public function getTechSpecs(): ?CategorySpecificTechSpecs
     {
-        if (!$this->techSpecs || !$this->getCategoryId()) {
+        if ($this->isNotFilled('techSpecs') || !$this->getCategoryId()) {
             return null;
         }
 
@@ -160,15 +143,15 @@ class StoreRequest extends AdminFormRequest implements VehicleData
         /** @var HandbookValue $category */
         $category = $handbookValueRepository->findOneById($this->getCategoryId());
 
-        return VehicleHelper::hydrateTechSpecs($category, (array) $this->techSpecs);
+        return VehicleHelper::hydrateTechSpecs($category, $this->array('techSpecs'));
     }
 
     public function getAppearancesIds(): array
     {
-        if (!$this->appearancesIds) {
+        if ($this->isNotFilled('appearancesIds')) {
             return [];
         }
 
-        return Arr::map($this->appearancesIds, static fn (string $id): int => (int) $id);
+        return Arr::map($this->array('appearancesIds'), static fn (string $id): int => (int) $id);
     }
 }
