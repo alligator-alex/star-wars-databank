@@ -1,3 +1,6 @@
+@use "../settings/colors";
+@use "../settings/media-breakpoints";
+
 .appearances {
     &__item {
         border-radius: 1rem;
@@ -8,7 +11,7 @@
         text-decoration: none;
         width: 150px;
 
-        @media(min-width: $desktop-min) {
+        @media(min-width: media-breakpoints.$desktop-min) {
             width: 200px;
         }
 
@@ -35,7 +38,7 @@
     }
 
     &__info {
-        background: linear-gradient(180deg, $black-10pct-transparent 30%, transparent);
+        background: linear-gradient(180deg, colors.$black-10pct-transparent 30%, transparent);
         opacity: 0;
         padding: 1rem;
         position: absolute;
@@ -45,7 +48,7 @@
     }
 
     &__name {
-        color: $white;
+        color: colors.$white;
         font-weight: 500;
         line-height: 1.15;
     }
@@ -60,9 +63,9 @@
 
     &__type,
     &__release-date {
-        background-color: $blue;
+        background-color: colors.$blue;
         border-radius: 1rem;
-        color: $white;
+        color: colors.$white;
         font-size: 0.75rem;
         font-weight: 500;
         line-height: 1rem;
@@ -70,12 +73,12 @@
     }
 
     &__type {
-        background-color: $yellow;
-        color: $black;
+        background-color: colors.$yellow;
+        color: colors.$black;
     }
 
     &__release-date {
-        background-color: $blue;
+        background-color: colors.$blue;
     }
 
     &__list {
@@ -112,7 +115,7 @@
             }
 
             &:hover {
-                background-color: $yellow;
+                background-color: colors.$yellow;
             }
         }
 
@@ -126,7 +129,7 @@
         }
 
         .flickity-page-dot {
-            background-color: $black-80pct-transparent;
+            background-color: colors.$black-80pct-transparent;
             border-radius: 1rem;
             height: 0.6rem;
             margin: 0 0.2rem;
@@ -140,11 +143,11 @@
             }
 
             &:hover {
-                background: $blue;
+                background: colors.$blue;
             }
 
             &.is-selected {
-                background-color: $yellow;
+                background-color: colors.$yellow;
                 width: 2rem;
             }
         }

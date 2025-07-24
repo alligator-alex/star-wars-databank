@@ -1,3 +1,7 @@
+@use "../settings/colors";
+@use "../settings/media-breakpoints";
+@use "../settings/typography";
+
 .entity-list {
     display: flex;
     flex-wrap: wrap;
@@ -7,7 +11,7 @@
         padding: 0.5rem;
         width: 100%;
 
-        @media(min-width: $desktop-min) {
+        @media(min-width: media-breakpoints.$desktop-min) {
             width: 33.333%;
         }
     }
@@ -23,7 +27,7 @@
         text-decoration: none;
         transition: outline-color 0.2s ease-in-out;
 
-        @media(min-width: $desktop-min) {
+        @media(min-width: media-breakpoints.$desktop-min) {
             height: 340px;
 
             &--large {
@@ -32,7 +36,7 @@
         }
 
         .rogue-links {
-            color: $dark-grey;
+            color: colors.$dark-grey;
             flex-wrap: wrap;
             font-size: 0.7rem;
             line-height: 1;
@@ -50,25 +54,25 @@
 
         &:hover,
         &[data-preview-target] {
-            outline-color: $yellow;
+            outline-color: colors.$yellow;
 
             .entity-list__info {
-                background-color: $dark-grey;
+                background-color: colors.$dark-grey;
 
                 .entity-list__faction-emblem {
-                    color: $yellow;
+                    color: colors.$yellow;
                 }
             }
 
             .entity-list__name {
-                color: $yellow;
+                color: colors.$yellow;
             }
 
             .rogue-links {
-                color: $light-grey;
+                color: colors.$light-grey;
 
                 &__value {
-                    color: $yellow;
+                    color: colors.$yellow;
                 }
             }
 
@@ -100,7 +104,7 @@
     }
 
     &__info {
-        background-color: $light-grey;
+        background-color: colors.$light-grey;
         padding: 0.75rem 1rem;
         transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
         width: 100%;
@@ -108,8 +112,8 @@
     }
 
     &__name {
-        color: $black;
-        font-family: $font-family-title;
+        color: colors.$black;
+        font-family: typography.$font-family-title;
         font-size: 1.25rem;
         line-height: 1.2;
         margin: 0;
@@ -124,7 +128,7 @@
     }
 
     &__image {
-        background-color: $light-grey;
+        background-color: colors.$light-grey;
         height: 100%;
         position: relative;
         width: 100%;

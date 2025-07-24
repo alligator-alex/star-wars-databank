@@ -1,10 +1,13 @@
+@use "../settings/colors";
+@use "../settings/typography";
+
 .ts-wrapper {
     font-size: 1rem;
     position: relative;
 
     .ts-control {
         align-items: center;
-        background-color: $white;
+        background-color: colors.$white;
         border-radius: 1rem;
         cursor: pointer;
         display: flex;
@@ -19,13 +22,13 @@
 
     &:hover {
         .ts-control {
-            outline-color: $yellow;
+            outline-color: colors.$yellow;
         }
     }
 
     &.focus {
         .ts-control {
-            outline-color: $yellow;
+            outline-color: colors.$yellow;
 
             input {
                 cursor: initial;
@@ -51,15 +54,15 @@
         width: 1.2rem;
 
         &:hover {
-            background-color: $yellow;
-            color: $black;
+            background-color: colors.$yellow;
+            color: colors.$black;
         }
     }
 
     input {
         background: none;
         border: 0;
-        color: $black;
+        color: colors.$black;
         cursor: pointer;
         flex: 1 0 30%;
         font-size: 1rem;
@@ -71,7 +74,7 @@
         z-index: 1;
 
         &::placeholder {
-            color: $dark-grey-alt;
+            color: colors.$dark-grey-alt;
             transition: color 0.2s ease-in-out;
         }
 
@@ -103,9 +106,9 @@
 
     .item {
         align-items: center;
-        background-color: $yellow;
+        background-color: colors.$yellow;
         border-radius: 1rem;
-        color: $black;
+        color: colors.$black;
         font-weight: 500;
         margin: 0 0 0.3rem 0.4rem;
         overflow: hidden;
@@ -135,17 +138,17 @@
             transition-property: background-color, color;
 
             &:hover {
-                background-color: $black;
-                color: $yellow;
+                background-color: colors.$black;
+                color: colors.$yellow;
             }
         }
     }
 
     .ts-dropdown {
-        background-color: $light-grey;
+        background-color: colors.$light-grey;
         border-radius: 1rem;
         border-top: 0;
-        box-shadow: 0 50px 100px 0 $black-80pct-transparent;
+        box-shadow: 0 50px 100px 0 colors.$black-80pct-transparent;
         line-height: 1.2;
         overflow: hidden;
         position: absolute;
@@ -175,8 +178,8 @@
         }
 
         .optgroup-header {
-            color: $dark-grey;
-            font-family: $font-family-title;
+            color: colors.$dark-grey;
+            font-family: typography.$font-family-title;
             font-weight: 500;
             padding: 0.4rem;
         }
@@ -189,12 +192,12 @@
             transition-property: background-color, color;
 
             &:nth-child(even) {
-                background-color: $light-grey-alt;
+                background-color: colors.$light-grey-alt;
             }
 
             &:hover {
-                background-color: $yellow;
-                color: $black;
+                background-color: colors.$yellow;
+                color: colors.$black;
             }
 
             &::before,
@@ -205,7 +208,7 @@
             }
 
             &::before {
-                border: 2px solid $black-50pct-transparent;
+                border: 2px solid colors.$black-50pct-transparent;
                 border-radius: 0.25rem;
                 height: 0.8rem;
                 left: 0.6rem;
@@ -215,7 +218,7 @@
             }
 
             &::after {
-                background-color: $yellow;
+                background-color: colors.$yellow;
                 border-radius: 0.1rem;
                 display: none;
                 height: 0.5rem;
@@ -226,14 +229,14 @@
             }
 
             &.selected {
-                color: $blue;
+                color: colors.$blue;
 
                 &:hover {
-                    color: $black;
+                    color: colors.$black;
                 }
 
                 &::before {
-                    background-color: $dark-grey;
+                    background-color: colors.$dark-grey;
                 }
 
                 &::after {

@@ -1,3 +1,7 @@
+@use "../settings/colors";
+@use "../settings/media-breakpoints";
+@use "../settings/typography";
+
 .page-wrapper--home-page {
     .intro {
         align-items: center;
@@ -23,7 +27,7 @@
             animation-fill-mode: forwards;
             animation-name: a-long-time-ago-progress;
             animation-timing-function: linear;
-            background: $yellow;
+            background: colors.$yellow;
             bottom: 0;
             content: '';
             display: block;
@@ -38,8 +42,8 @@
             animation-fill-mode: forwards;
             animation-name: a-long-time-ago;
             animation-timing-function: ease-in-out;
-            color: $intro-blue;
-            font-family: $font-family-common;
+            color: colors.$intro-blue;
+            font-family: typography.$font-family-common;
             font-size: 2.25rem;
             font-weight: normal;
             margin: 0;
@@ -48,7 +52,7 @@
         }
 
         &__skip-button {
-            color: $light-grey;
+            color: colors.$light-grey;
             cursor: pointer;
             font-size: 2rem;
             line-height: 2rem;
@@ -60,7 +64,7 @@
             width: 2rem;
 
             &:hover {
-                color: $yellow;
+                color: colors.$yellow;
             }
         }
     }
@@ -133,7 +137,7 @@
 
         &__item {
             align-items: center;
-            color: $black;
+            color: colors.$black;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -144,12 +148,12 @@
             transition: none;
             width: 33.333%;
 
-            @media(min-width: $desktop-min) {
+            @media(min-width: media-breakpoints.$desktop-min) {
                 margin: 0 0 2.5rem;
                 width: 20%;
             }
 
-            @media(min-width: $desktop-max) {
+            @media(min-width: media-breakpoints.$desktop-max) {
                 width: 11.1111111111%;
 
                 &:hover {
@@ -160,7 +164,7 @@
             }
 
             &:hover {
-                color: $blue;
+                color: colors.$blue;
 
                 .factions-selector__emblem {
                     filter: none;
@@ -188,7 +192,7 @@
 
     .appearances {
         &__title {
-            color: $dark-grey;
+            color: colors.$dark-grey;
             margin-bottom: 1rem;
             text-align: left;
         }
@@ -197,11 +201,11 @@
             margin-bottom: 1rem;
             width: 50%;
 
-            @media(min-width: $desktop-min) {
+            @media(min-width: media-breakpoints.$desktop-min) {
                 width: 25%;
             }
 
-            @media(min-width: $desktop-max) {
+            @media(min-width: media-breakpoints.$desktop-max) {
                 width: 20%;
             }
         }
@@ -210,7 +214,7 @@
             width: 100%;
 
             &:hover {
-                color: $blue;
+                color: colors.$blue;
             }
         }
     }

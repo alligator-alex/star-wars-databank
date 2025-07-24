@@ -1,6 +1,8 @@
+@use "../settings/colors";
+
 .breadcrumbs {
     align-items: center;
-    color: $dark-grey;
+    color: colors.$dark-grey;
     cursor: default;
     display: inline-flex;
     font-size: 0.8rem;
@@ -17,11 +19,11 @@
         transition: color 0.2s ease-in-out;
 
         &:hover {
-            color: $yellow;
+            color: colors.$yellow;
         }
     }
 
     &__text {
-        color: $dark-grey-alt;
+        color: colors.$dark-grey-alt;
     }
 }

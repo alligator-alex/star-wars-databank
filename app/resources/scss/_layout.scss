@@ -1,22 +1,26 @@
+@use "settings/colors";
+@use "settings/media-breakpoints";
+@use "settings/typography";
+
 html {
-    font-family: $font-family-common;
-    font-size: $font-size-mobile;
+    font-family: typography.$font-family-common;
+    font-size: typography.$font-size-mobile;
     font-weight: normal;
-    line-height: $line-height-common;
+    line-height: typography.$line-height-common;
     scroll-behavior: smooth;
 
-    @media(min-width: $desktop-min) {
-        font-size: $font-size-desktop;
+    @media(min-width: media-breakpoints.$desktop-min) {
+        font-size: typography.$font-size-desktop;
     }
 }
 
 ::selection {
-    background-color: $yellow;
-    color: $black;
+    background-color: colors.$yellow;
+    color: colors.$black;
 }
 
 body {
-    color: $black;
+    color: colors.$black;
     margin: 0;
     min-width: 375px;
     overflow-x: hidden;
@@ -29,7 +33,7 @@ a:hover {
 }
 
 .page-wrapper {
-    background: $primary-grey;
+    background: colors.$primary-grey;
     box-shadow: 0 2px 4px 2px rgba(0, 0, 0, 0.1);
     margin-bottom: 8rem;
     min-height: 100vh;
@@ -37,7 +41,7 @@ a:hover {
     position: relative;
     z-index: 1;
 
-    @media(min-width: $desktop-min) {
+    @media(min-width: media-breakpoints.$desktop-min) {
         margin-bottom: 4rem;
         padding: 2.5rem 0;
     }
@@ -52,21 +56,21 @@ a {
 }
 
 a:hover {
-    color: $yellow;
+    color: colors.$yellow;
 }
 
 .container {
     padding: 0 1rem;
 
-    @media(min-width: $desktop-min) {
+    @media(min-width: media-breakpoints.$desktop-min) {
         padding: 0 9rem;
     }
 }
 
 .footer {
-    background: $dark-grey;
+    background: colors.$dark-grey;
     bottom: 0;
-    color: $white;
+    color: colors.$white;
     font-size: 0.75rem;
     position: fixed;
     width: 100%;
@@ -75,7 +79,7 @@ a:hover {
         margin: 0;
         text-align: center;
 
-        @media(min-width: $desktop-min) {
+        @media(min-width: media-breakpoints.$desktop-min) {
             &:first-child,
             &:last-child {
                 flex: 1 1 0;
@@ -99,7 +103,7 @@ a:hover {
         justify-content: space-between;
         padding: 1rem;
 
-        @media(min-width: $desktop-min) {
+        @media(min-width: media-breakpoints.$desktop-min) {
             flex-direction: row;
             height: 4rem;
             padding: 0 9rem;
@@ -117,12 +121,12 @@ svg {
     line-height: 1;
     margin-bottom: 1rem;
 
-    @media(min-width: $desktop-min) {
+    @media(min-width: media-breakpoints.$desktop-min) {
         margin-bottom: 2rem;
     }
 
     .aurebesh {
-        color: $dark-grey;
+        color: colors.$dark-grey;
         font-size: 1rem;
         font-weight: bold;
     }
@@ -131,7 +135,7 @@ svg {
 h1, .h1,
 h2, .h2,
 h3, .h3 {
-    font-family: $font-family-title;
+    font-family: typography.$font-family-title;
     font-weight: 500;
 }
 
@@ -140,7 +144,7 @@ h1, .h1 {
     letter-spacing: 0.15rem;
     text-transform: uppercase;
 
-    @media(min-width: $desktop-min) {
+    @media(min-width: media-breakpoints.$desktop-min) {
         font-size: 2.2rem;
     }
 }

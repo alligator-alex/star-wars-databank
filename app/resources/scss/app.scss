@@ -1,6 +1,6 @@
-@import "settings/index";
-@import "reset";
-@import "layout";
-@import "errors";
-@import "base";
-@import "_bem/index";
+@use "settings/index";
+@use "reset";
+@use "layout";
+@use "errors";
+@use "base";
+@use "_bem/index" as bem;

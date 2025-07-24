@@ -1,12 +1,16 @@
+@use "../settings/colors";
+@use "../settings/media-breakpoints";
+@use "../settings/typography";
+
 .entity-filter {
     margin-bottom: 1rem;
 
     &__toggle {
         align-items: center;
-        color: $dark-grey;
+        color: colors.$dark-grey;
         cursor: pointer;
         display: inline-flex;
-        font-family: $font-family-title;
+        font-family: typography.$font-family-title;
         font-size: 1.25rem;
         font-weight: 500;
         justify-content: start;
@@ -26,9 +30,9 @@
             }
 
             &::after {
-                background-color: $yellow;
+                background-color: colors.$yellow;
                 border-radius: 50%;
-                color: $black;
+                color: colors.$black;
                 content: attr(data-applied-filters-count);
                 display: inline-block;
                 font-size: 0.7rem;
@@ -50,7 +54,7 @@
         }
 
         &:hover {
-            color: $blue;
+            color: colors.$blue;
 
             .burger-menu-icon {
                 width: 1.75rem;
@@ -88,7 +92,7 @@
             width: 1.25rem;
 
             &__item {
-                background-color: $blue;
+                background-color: colors.$blue;
                 height: 3px;
                 transition-duration: 0.2s;
                 transition-property: width;
@@ -120,7 +124,7 @@
         gap: 0.5rem;
         grid-template-columns: repeat(1, minmax(0, 1fr));
 
-        @media(min-width: $desktop-min) {
+        @media(min-width: media-breakpoints.$desktop-min) {
             gap: 1rem;
             grid-template-columns: repeat(3, minmax(0, 1fr));
         }
@@ -163,7 +167,7 @@
                 }
 
                 &::before {
-                    color: $black;
+                    color: colors.$black;
                 }
             }
         }
@@ -171,7 +175,7 @@
         &.focus {
             .ts-control {
                 &::before {
-                    color: $yellow;
+                    color: colors.$yellow;
                 }
             }
         }
@@ -186,9 +190,9 @@
     &__input {
         .ts-control {
             &::before {
-                color: $dark-grey-alt;
+                color: colors.$dark-grey-alt;
                 content: "";
-                font-family: $font-family-icons;
+                font-family: typography.$font-family-icons;
                 font-size: 1.25rem;
                 font-weight: 400;
                 left: 4px;
@@ -204,7 +208,7 @@
 
             &:hover {
                 &:before {
-                    color: $yellow;
+                    color: colors.$yellow;
                 }
             }
         }

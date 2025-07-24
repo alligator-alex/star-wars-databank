@@ -1,7 +1,7 @@
 /** Paths must be relative to app.scss! **/
 @font-face {
     font-family: 'FT Aurebesh';
-    src: url('../fonts/FTAurebesh-Regular.woff2') format('woff2');
+    src: url('../../fonts/FTAurebesh-Regular.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -9,7 +9,7 @@
 
 @font-face {
     font-family: 'FT Aurebesh';
-    src: url('../fonts/FTAurebesh-Bold.woff2') format('woff2');
+    src: url('../../fonts/FTAurebesh-Bold.woff2') format('woff2');
     font-weight: bold;
     font-style: normal;
     font-display: swap;
@@ -17,7 +17,7 @@
 
 @font-face {
     font-family: 'RogueAF';
-    src: url('../fonts/RogueAF.woff2') format('woff2');
+    src: url('../../fonts/RogueAF.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -25,7 +25,7 @@
 
 @font-face {
     font-family: 'Montserrat';
-    src: url('../fonts/Montserrat-Regular.woff2') format('woff2');
+    src: url('../../fonts/Montserrat-Regular.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -33,7 +33,7 @@
 
 @font-face {
     font-family: 'Montserrat';
-    src: url('../fonts/Montserrat-Medium.woff2') format('woff2');
+    src: url('../../fonts/Montserrat-Medium.woff2') format('woff2');
     font-weight: 500;
     font-style: normal;
     font-display: swap;
@@ -41,7 +41,7 @@
 
 @font-face {
     font-family: 'Montserrat';
-    src: url('../fonts/Montserrat-Bold.woff2') format('woff2');
+    src: url('../../fonts/Montserrat-Bold.woff2') format('woff2');
     font-weight: bold;
     font-style: normal;
     font-display: swap;
@@ -49,7 +49,7 @@
 
 @font-face {
     font-family: 'Gabarito';
-    src: url('../fonts/Gabarito-Medium.woff2') format('woff2');
+    src: url('../../fonts/Gabarito-Medium.woff2') format('woff2');
     font-weight: 500;
     font-style: normal;
     font-display: swap;

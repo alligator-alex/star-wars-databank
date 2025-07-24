@@ -1,3 +1,7 @@
+@use "settings/colors";
+@use "settings/media-breakpoints";
+@use "settings/typography";
+
 .is-hidden {
     display: none;
     visibility: hidden;
@@ -5,7 +9,7 @@
 
 .rogue-icon {
     cursor: default;
-    font-family: $font-family-icons;
+    font-family: typography.$font-family-icons;
     font-size: 1.2em;
     font-weight: normal;
     letter-spacing: 0;
@@ -16,7 +20,7 @@
 }
 
 .rogue-links {
-    color: $light-grey;
+    color: colors.$light-grey;
     display: flex;
     font-weight: 500;
     gap: 1em;
@@ -35,13 +39,13 @@
     }
 
     &__link {
-        color: $white;
+        color: colors.$white;
         text-decoration: none;
     }
 }
 
 .aurebesh {
-    font-family: $font-family-aurebesh;
+    font-family: typography.$font-family-aurebesh;
     line-height: 1;
     text-transform: uppercase;
     user-select: none;
@@ -49,7 +53,7 @@
 
 .pretty-link {
     display: inline-block;
-    font-family: $font-family-title;
+    font-family: typography.$font-family-title;
     margin-left: -1.5rem;
     padding: 0 0 0.2rem 1rem;
     position: relative;
@@ -167,7 +171,7 @@ a.faction-emblem {
     border-radius: 5rem;
     cursor: pointer;
     display: inline-block;
-    font-family: $font-family-title;
+    font-family: typography.$font-family-title;
     font-size: 1.1rem;
     font-weight: 500;
     letter-spacing: 0.06rem;
@@ -187,12 +191,12 @@ a.faction-emblem {
 }
 
 .button--yellow {
-    background-color: $yellow;
-    color: $dark-grey;
+    background-color: colors.$yellow;
+    color: colors.$dark-grey;
 
     &:hover {
-        background-color: $blue;
-        color: $white;
+        background-color: colors.$blue;
+        color: colors.$white;
     }
 }
 
@@ -210,17 +214,17 @@ a.faction-emblem {
 
         &:hover {
             .switcher__name {
-                background-color: $blue;
-                color: $white;
+                background-color: colors.$blue;
+                color: colors.$white;
             }
         }
     }
 
     &__name {
-        background-color: $yellow;
+        background-color: colors.$yellow;
         border-radius: 1rem;
-        border-right: 1px solid $primary-grey;
-        color: $black;
+        border-right: 1px solid colors.$primary-grey;
+        color: colors.$black;
         display: block;
         font-weight: 500;
         margin-right: 0.4rem;
@@ -235,8 +239,8 @@ a.faction-emblem {
     }
 
     input:checked + .switcher__name {
-        background-color: $dark-grey;
-        color: $white;
+        background-color: colors.$dark-grey;
+        color: colors.$white;
         cursor: default;
     }
 }
@@ -249,7 +253,7 @@ a.faction-emblem {
     justify-content: flex-start;
     margin-bottom: 1.5rem;
 
-    @media(min-width: $desktop-min) {
+    @media(min-width: media-breakpoints.$desktop-min) {
         flex-direction: row;
     }
 
@@ -274,11 +278,11 @@ a.faction-emblem {
 }
 
 .cookie-modal {
-    background: $blue;
+    background: colors.$blue;
     border-radius: 1rem;
     bottom: 1rem;
-    box-shadow: 0 50px 100px 0 $black-90pct-transparent;
-    color: $white;
+    box-shadow: 0 50px 100px 0 colors.$black-90pct-transparent;
+    color: colors.$white;
     left: 1rem;
     padding: 1rem;
     position: fixed;
@@ -286,7 +290,7 @@ a.faction-emblem {
     user-select: none;
     z-index: 5;
 
-    @media(min-width: $desktop-min) {
+    @media(min-width: media-breakpoints.$desktop-min) {
         left: auto;
         width: 400px;
     }
@@ -297,14 +301,14 @@ a.faction-emblem {
     }
 
     .button {
-        background-color: $white;
-        color: $dark-grey;
+        background-color: colors.$white;
+        color: colors.$dark-grey;
         font-size: 0.75rem;
         padding: 0.4rem 1rem;
 
         &:hover {
-            background-color: $dark-grey;
-            color: $white;
+            background-color: colors.$dark-grey;
+            color: colors.$white;
         }
     }
 }
