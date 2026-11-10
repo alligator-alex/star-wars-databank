@@ -8,4 +8,3 @@
 /.rabbitmq*
 /.redis
 /.backup
-/app/resources/views/public/layouts/partials/counters.blade.php
